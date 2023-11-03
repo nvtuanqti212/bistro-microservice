@@ -17,8 +17,8 @@ public class FoodController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createFood(@RequestBody FoodRequest request) {
-        foodService.createFood(request);
+    public FoodResponse createFood(@RequestBody FoodRequest request) {
+        return foodService.createFood(request);
     }
 
     @GetMapping
