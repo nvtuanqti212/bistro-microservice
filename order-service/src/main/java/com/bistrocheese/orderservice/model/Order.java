@@ -29,7 +29,6 @@ public class Order {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @ManyToOne
     @JoinColumn(name = "staff_id", nullable = false)
     private UUID staffId;
 
