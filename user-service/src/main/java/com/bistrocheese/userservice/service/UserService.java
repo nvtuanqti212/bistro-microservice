@@ -8,5 +8,5 @@ import java.util.List;
 public interface UserService {
     Boolean isEmailExists(String email);
     void saveUser(UserRequest userRequest);
-//    List<User> getUsers();
+    List<User> getUsers();
 }

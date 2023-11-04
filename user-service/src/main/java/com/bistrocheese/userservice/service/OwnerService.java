@@ -1,7 +1,6 @@
 package com.bistrocheese.userservice.service;
 
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
-import com.bistrocheese.userservice.model.user.Owner;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 
 import java.util.List;
@@ -9,5 +8,4 @@ import java.util.List;
 public interface OwnerService extends UserService{
     void createUser(UserRequest userRequest);
     List<User> getAllUsers();
-    List<Owner> getOwners();
 }

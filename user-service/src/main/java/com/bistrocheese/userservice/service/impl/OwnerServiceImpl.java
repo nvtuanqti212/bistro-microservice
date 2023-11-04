@@ -12,23 +12,35 @@ import com.bistrocheese.userservice.service.StaffService;
 import com.bistrocheese.userservice.service.UserService;
 import com.bistrocheese.userservice.service.factory.OwnerFactory;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class OwnerServiceImpl implements UserService, OwnerService {
     private final OwnerFactory ownerFactory;
     private final OwnerRepository ownerRepository;
     private final ManagerService managerService;
     private final StaffService staffService;
+
     private final Map<Integer, UserService> roleToServiceMap;
+    private final UserService[] services;
+    public OwnerServiceImpl(
+            OwnerFactory ownerFactory,
+            OwnerRepository ownerRepository,
+            ManagerService managerService,
+            StaffService staffService,
+            Map<Integer, UserService> roleToServiceMap
+    ) {
+        this.ownerFactory = ownerFactory;
+        this.ownerRepository = ownerRepository;
+        this.managerService = managerService;
+        this.staffService = staffService;
+        this.roleToServiceMap = roleToServiceMap;
+        this.services = new UserService[]{this, managerService, staffService};
+    }
 
     @PostConstruct
     private void initRoleToServiceMap() {
@@ -47,6 +59,11 @@ public class OwnerServiceImpl implements UserService, OwnerService {
     public void saveUser(UserRequest userRequest) {
         ownerRepository.save((Owner) ownerFactory.create(userRequest));
     }
+
+    @Override
+    public List<User> getUsers() {
+        return  new ArrayList<>(ownerRepository.findAll());
+    }
     // UserService implementation End
 
     // OwnerService implementation Start
@@ -64,21 +81,15 @@ public class OwnerServiceImpl implements UserService, OwnerService {
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        users.addAll(this.getOwners());
-        users.addAll(managerService.getManagers());
-        users.addAll(staffService.getStaffs());
+        for (UserService service : this.services) {
+            users.addAll(service.getUsers());
+        }
         return users;
-    }
-
-    @Override
-    public List<Owner> getOwners() {
-        return ownerRepository.findAll();
     }
     // OwnerService implementation End
 
     private void checkEmailExists(String email) {
-        UserService[] services = {this, managerService, staffService};
-        for (UserService service : services) {
+        for (UserService service : this.services) {
             if (service.isEmailExists(email)) {
                 throw new BadRequestException(MessageConstant.EMAIL_ALREADY_EXISTS);
             }
