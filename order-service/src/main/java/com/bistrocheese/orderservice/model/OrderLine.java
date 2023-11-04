@@ -32,7 +32,6 @@ public class OrderLine implements Serializable {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @ManyToOne
     @JoinColumn(name = "food_id")
     private UUID food;
 
