@@ -16,4 +16,14 @@ public class ManagerFactory extends UserFactory {
                 userRequest.getExperiencedYear()
         );
     }
+
+    @Override
+    protected User updateUser(User user, UserRequest userRequest) {
+        return new Manager(
+                user,
+                userRequest.getCertificationManagement(),
+                userRequest.getForeignLanguage(),
+                userRequest.getExperiencedYear()
+        );
+    }
 }

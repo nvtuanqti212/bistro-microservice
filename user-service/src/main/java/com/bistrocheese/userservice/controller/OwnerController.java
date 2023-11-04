@@ -38,12 +38,44 @@ public class OwnerController {
         );
     }
 
-//    @GetMapping(RouteConstant.USER_ID)
-//    public ResponseEntity<MessageResponse> getUserById(@PathVariable String userId) {
+    @GetMapping(RouteConstant.USER_ID)
+    public ResponseEntity<SuccessResponse<User>> getUserDetail(@PathVariable String userId) {
+        return ResponseEntity.ok(
+                new SuccessResponse<>(
+                        MessageConstant.GET_USER_DETAIL_SUCCESS,
+                        ownerService.getUserDetail(userId)
+                )
+        );
+    }
+
+    @DeleteMapping(RouteConstant.USER_ID)
+    public ResponseEntity<MessageResponse> deleteUser(@PathVariable String userId) {
+        ownerService.deleteUser(userId);
+        return ResponseEntity.ok(
+                new MessageResponse(MessageConstant.DELETE_USER_SUCCESS)
+        );
+    }
+
+    @PutMapping(RouteConstant.USER_ID)
+    public ResponseEntity<MessageResponse> updateUser(@PathVariable String userId, @RequestBody UserRequest userRequest) {
+        ownerService.updateUser(userId, userRequest);
+        return ResponseEntity.ok(
+                new MessageResponse(MessageConstant.UPDATE_USER_SUCCESS)
+        );
+    }
+
+//    @GetMapping(RouteConstant.SEARCH)
+//    public ResponseEntity<SuccessResponse<PagingResponse>> searchUser(
+//            @RequestParam(required = false) String name,
+//            @RequestParam(required = false) String role,
+//            @RequestParam(required = false) String sort,
+//            @RequestParam(name="page_number", defaultValue = "1") Integer pageNumber,
+//            @RequestParam(name="page_size", defaultValue = "10") Integer pageSize
+//    ) {
 //        return ResponseEntity.ok(
 //                new SuccessResponse<>(
-//                        MessageConstant.GET_USER_SUCCESS,
-//                        ownerService.getUserById(userId)
+//                        MessageConstant.SEARCH_USER_SUCCESS,
+//                        ownerService.searchAllUser(name, role, sort, pageNumber, pageSize)
 //                )
 //        );
 //    }

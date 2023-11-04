@@ -9,6 +9,7 @@ import com.bistrocheese.userservice.model.user.baseUser.User;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public abstract class UserFactory {
     public User create(UserRequest userRequest) {
@@ -33,9 +34,41 @@ public abstract class UserFactory {
                 .createdDate(date)
                 .lastModifiedDate(date)
                 .build();
-        user = createUser(user, userRequest);
+        return createUser(user, userRequest);
+    }
+
+    public User update(User user, UserRequest userRequest) {
+        // Update Role
+        if (!Objects.equals(userRequest.getRoleId(), user.getRoleId())) {
+            String userId = user.getId();
+            Date createdDate = user.getCreatedDate();
+            user = this.create(userRequest);
+            user.setCreatedDate(createdDate);
+            user.setId(userId);
+            return user;
+        }
+
+        Date date = new Date();
+        String dateOfBirth = userRequest.getDateOfBirth();
+        DateFormat dateFormat = new SimpleDateFormat(DateConstant.FORMAT_DATE);
+        Date dob;
+        try {
+            dob = dateFormat.parse(dateOfBirth);
+        } catch (Exception e) {
+            throw new BadRequestException(MessageConstant.INVALID_DATE_OF_BIRTH);
+        }
+        user.setEmail(userRequest.getEmail());
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
+        user.setStatus(userRequest.getStatus());
+        user.setPhoneNumber(userRequest.getPhoneNumber());
+        user.setDateOfBirth(dob);
+        user.setLastModifiedDate(date);
+        user = updateUser(user, userRequest);
         return user;
     }
 
     protected abstract User createUser(User user, UserRequest userRequest);
+
+    protected abstract User updateUser(User user, UserRequest userRequest);
 }

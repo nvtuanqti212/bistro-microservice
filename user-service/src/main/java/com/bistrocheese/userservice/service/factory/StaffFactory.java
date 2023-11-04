@@ -15,4 +15,13 @@ public class StaffFactory extends UserFactory{
                 userRequest.getAcademicLevel()
         );
     }
+
+    @Override
+    protected User updateUser(User user, UserRequest userRequest) {
+        return new Staff(
+                user,
+                userRequest.getForeignLanguage(),
+                userRequest.getAcademicLevel()
+        );
+    }
 }

@@ -6,4 +6,5 @@ public class RouteConstant {
     public static final String OWNER = API + "/owner";
     public static final String USERS = "/users";
     public static final String USER_ID = USERS + "/{userId}";
+    public static final String SEARCH = USERS + "/search";
 }

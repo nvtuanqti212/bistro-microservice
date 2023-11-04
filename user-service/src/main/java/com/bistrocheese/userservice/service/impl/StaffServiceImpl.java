@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,21 @@ public class StaffServiceImpl implements UserService, StaffService {
     @Override
     public List<User> getUsers() {
         return new ArrayList<>(staffRepository.findAll());
+    }
+
+    @Override
+    public Optional<? extends User> getUserById(String userId) {
+        return staffRepository.findById(userId);
+    }
+
+    @Override
+    public void deleteUserById(String userId) {
+        staffRepository.deleteById(userId);
+    }
+
+    @Override
+    public void updateUserById(User user, UserRequest userRequest) {
+        staffRepository.save((Staff) staffFactory.update(user, userRequest));
     }
     // UserService implementation End
 }

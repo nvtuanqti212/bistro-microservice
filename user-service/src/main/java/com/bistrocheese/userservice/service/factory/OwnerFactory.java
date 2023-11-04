@@ -15,4 +15,13 @@ public class OwnerFactory extends UserFactory {
                 userRequest.getLicenseBusiness()
         );
     }
+
+    @Override
+    protected User updateUser(User user, UserRequest userRequest) {
+        return new Owner(
+                user,
+                userRequest.getBranch(),
+                userRequest.getLicenseBusiness()
+        );
+    }
 }

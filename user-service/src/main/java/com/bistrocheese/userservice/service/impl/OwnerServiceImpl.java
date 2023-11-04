@@ -14,9 +14,7 @@ import com.bistrocheese.userservice.service.factory.OwnerFactory;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OwnerServiceImpl implements UserService, OwnerService {
@@ -27,6 +25,7 @@ public class OwnerServiceImpl implements UserService, OwnerService {
 
     private final Map<Integer, UserService> roleToServiceMap;
     private final UserService[] services;
+
     public OwnerServiceImpl(
             OwnerFactory ownerFactory,
             OwnerRepository ownerRepository,
@@ -64,6 +63,21 @@ public class OwnerServiceImpl implements UserService, OwnerService {
     public List<User> getUsers() {
         return  new ArrayList<>(ownerRepository.findAll());
     }
+
+    @Override
+    public Optional<? extends User> getUserById(String userId) {
+        return ownerRepository.findById(userId);
+    }
+
+    @Override
+    public void deleteUserById(String userId) {
+        ownerRepository.deleteById(userId);
+    }
+
+    @Override
+    public void updateUserById(User user, UserRequest userRequest) {
+        ownerRepository.save((Owner) ownerFactory.update(user, userRequest));
+    }
     // UserService implementation End
 
     // OwnerService implementation Start
@@ -85,6 +99,56 @@ public class OwnerServiceImpl implements UserService, OwnerService {
             users.addAll(service.getUsers());
         }
         return users;
+    }
+
+    @Override
+    public User getUserDetail(String userId) {
+        for (UserService service : this.services) {
+            Optional<? extends User> user = service.getUserById(userId);
+            if (user.isPresent()) {
+                return user.get();
+            }
+        }
+        throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        for (UserService service : this.services) {
+            Optional<? extends User> user = service.getUserById(userId);
+            if (user.isPresent()) {
+                service.deleteUserById(userId);
+                return;
+            }
+        }
+        throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
+    }
+
+    @Override
+    public void updateUser(String userId, UserRequest userRequest) {
+        this.checkEmailExists(userRequest.getEmail());
+        for (UserService service : this.services) {
+            Optional<? extends User> user = service.getUserById(userId);
+            if (user.isPresent()) {
+                // Update Role
+                if (!Objects.equals(user.get().getRoleId(), userRequest.getRoleId())) {
+                    UserService userService = roleToServiceMap.get(userRequest.getRoleId());
+                    if (userService == null) {
+                        throw new BadRequestException(MessageConstant.INVALID_ROLE_ID);
+                    } else {
+                        // Delete User In Old Role
+                        service.deleteUserById(userId);
+                        // Update User In New Role
+                        userService.updateUserById(user.get(), userRequest);
+                    }
+                    return;
+                }
+                // Update User
+                service.updateUserById(user.get(), userRequest);
+                return;
+            }
+        }
+        throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
     }
     // OwnerService implementation End
 
