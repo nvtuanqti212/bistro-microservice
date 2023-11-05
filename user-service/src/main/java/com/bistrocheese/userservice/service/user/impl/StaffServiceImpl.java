@@ -1,12 +1,12 @@
-package com.bistrocheese.userservice.service.impl;
+package com.bistrocheese.userservice.service.user.impl;
 
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.model.user.Staff;
 import com.bistrocheese.userservice.model.user.baseUser.User;
-import com.bistrocheese.userservice.repository.StaffRepository;
-import com.bistrocheese.userservice.service.StaffService;
-import com.bistrocheese.userservice.service.UserService;
-import com.bistrocheese.userservice.service.factory.StaffFactory;
+import com.bistrocheese.userservice.repository.user.StaffRepository;
+import com.bistrocheese.userservice.service.user.StaffService;
+import com.bistrocheese.userservice.service.user.UserService;
+import com.bistrocheese.userservice.service.user.factory.StaffFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

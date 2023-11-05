@@ -1,16 +1,16 @@
-package com.bistrocheese.userservice.service.impl;
+package com.bistrocheese.userservice.service.user.impl;
 
 import com.bistrocheese.userservice.constant.MessageConstant;
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.exception.BadRequestException;
 import com.bistrocheese.userservice.model.user.Owner;
 import com.bistrocheese.userservice.model.user.baseUser.User;
-import com.bistrocheese.userservice.repository.OwnerRepository;
-import com.bistrocheese.userservice.service.ManagerService;
-import com.bistrocheese.userservice.service.OwnerService;
-import com.bistrocheese.userservice.service.StaffService;
-import com.bistrocheese.userservice.service.UserService;
-import com.bistrocheese.userservice.service.factory.OwnerFactory;
+import com.bistrocheese.userservice.repository.user.OwnerRepository;
+import com.bistrocheese.userservice.service.user.ManagerService;
+import com.bistrocheese.userservice.service.user.OwnerService;
+import com.bistrocheese.userservice.service.user.StaffService;
+import com.bistrocheese.userservice.service.user.UserService;
+import com.bistrocheese.userservice.service.user.factory.OwnerFactory;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 

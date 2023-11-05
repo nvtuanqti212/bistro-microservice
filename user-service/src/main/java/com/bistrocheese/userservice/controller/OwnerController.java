@@ -6,7 +6,7 @@ import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.dto.response.MessageResponse;
 import com.bistrocheese.userservice.dto.response.SuccessResponse;
 import com.bistrocheese.userservice.model.user.baseUser.User;
-import com.bistrocheese.userservice.service.OwnerService;
+import com.bistrocheese.userservice.service.user.OwnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

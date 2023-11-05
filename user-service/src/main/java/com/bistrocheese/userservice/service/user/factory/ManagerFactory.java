@@ -1,4 +1,4 @@
-package com.bistrocheese.userservice.service.factory;
+package com.bistrocheese.userservice.service.user.factory;
 
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.model.user.Manager;

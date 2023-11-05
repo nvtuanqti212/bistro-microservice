@@ -1,4 +1,4 @@
-package com.bistrocheese.userservice.service;
+package com.bistrocheese.userservice.service.user;
 
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.model.user.baseUser.User;

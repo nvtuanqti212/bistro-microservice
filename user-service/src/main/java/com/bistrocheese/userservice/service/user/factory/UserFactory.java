@@ -1,4 +1,4 @@
-package com.bistrocheese.userservice.service.factory;
+package com.bistrocheese.userservice.service.user.factory;
 
 import com.bistrocheese.userservice.constant.DateConstant;
 import com.bistrocheese.userservice.constant.MessageConstant;

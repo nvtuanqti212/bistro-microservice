@@ -5,12 +5,15 @@ import lombok.Getter;
 @Getter
 public class MessageConstant {
     // Success messages
+        // Users
     public static final String CREATE_USER_SUCCESS = "Created user successfully";
     public static final String GET_USERS_SUCCESS = "Get users successfully";
     public static final String GET_USER_DETAIL_SUCCESS = "Get user detail successfully";
     public static final String UPDATE_USER_SUCCESS = "Updated user successfully";
     public static final String DELETE_USER_SUCCESS = "Deleted user successfully";
     public static final String SEARCH_USER_SUCCESS = "Searched user successfully";
+        // Schedule
+    public static final String ASSIGN_STAFF_TO_SCHEDULE_SUCCESS = "Assigned staff to schedule successfully";
 
     // Exception messages
     public static final String USER_NOT_FOUND = "User not found";

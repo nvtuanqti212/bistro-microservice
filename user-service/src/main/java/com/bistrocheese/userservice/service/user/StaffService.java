@@ -1,4 +1,4 @@
-package com.bistrocheese.userservice.service;
+package com.bistrocheese.userservice.service.user;
 
 public interface StaffService extends UserService{
 }

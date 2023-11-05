@@ -1,27 +1,27 @@
-package com.bistrocheese.userservice.service.factory;
+package com.bistrocheese.userservice.service.user.factory;
 
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
-import com.bistrocheese.userservice.model.user.Owner;
+import com.bistrocheese.userservice.model.user.Staff;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OwnerFactory extends UserFactory {
+public class StaffFactory extends UserFactory{
     @Override
     protected User createUser(User user, UserRequest userRequest) {
-        return new Owner(
+        return new Staff(
                 user,
-                userRequest.getBranch(),
-                userRequest.getLicenseBusiness()
+                userRequest.getForeignLanguage(),
+                userRequest.getAcademicLevel()
         );
     }
 
     @Override
     protected User updateUser(User user, UserRequest userRequest) {
-        return new Owner(
+        return new Staff(
                 user,
-                userRequest.getBranch(),
-                userRequest.getLicenseBusiness()
+                userRequest.getForeignLanguage(),
+                userRequest.getAcademicLevel()
         );
     }
 }
