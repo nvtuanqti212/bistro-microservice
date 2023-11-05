@@ -1,10 +1,9 @@
 spring:
   application:
-    name: foodservice
+    name: eurekaservice
   profiles:
     active:
       default
   cloud:
     config:
-      enabled: true
       uri: http://localhost:8888

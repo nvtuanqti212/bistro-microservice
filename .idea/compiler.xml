@@ -11,6 +11,7 @@
         <module name="food-service" />
         <module name="order-service" />
         <module name="user-service" />
+        <module name="eureka-server" />
       </profile>
     </annotationProcessing>
   </component>
@@ -18,6 +19,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="cheese_bistro_microservice" options="" />
       <module name="config-server" options="-parameters" />
+      <module name="eureka-server" options="-parameters" />
       <module name="food-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
