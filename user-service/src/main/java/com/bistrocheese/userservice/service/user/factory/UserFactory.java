@@ -4,6 +4,7 @@ import com.bistrocheese.userservice.constant.DateConstant;
 import com.bistrocheese.userservice.constant.MessageConstant;
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.exception.BadRequestException;
+import com.bistrocheese.userservice.model.user.baseUser.Role;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 
 import java.text.DateFormat;
@@ -26,7 +27,7 @@ public abstract class UserFactory {
                 .email(userRequest.getEmail())
                 .firstName(userRequest.getFirstName())
                 .lastName(userRequest.getLastName())
-                .roleId(userRequest.getRoleId())
+                .role(Role.convertIntToRole(userRequest.getRole()))
                 .status(userRequest.getStatus())
                 .password(userRequest.getPassword())
                 .phoneNumber(userRequest.getPhoneNumber())
@@ -39,7 +40,7 @@ public abstract class UserFactory {
 
     public User update(User user, UserRequest userRequest) {
         // Update Role
-        if (!Objects.equals(userRequest.getRoleId(), user.getRoleId())) {
+        if (!Objects.equals(userRequest.getRole(), user.getRole().ordinal())) {
             String userId = user.getId();
             Date createdDate = user.getCreatedDate();
             user = this.create(userRequest);

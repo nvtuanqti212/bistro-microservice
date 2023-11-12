@@ -12,7 +12,4 @@ public class RouteConstant {
 
     // Manager
     public static final String MANAGERS = API + "/managers";
-    public static final String MANAGER_ID = MANAGERS + "/{managerId}";
-    public static final String SCHEDULES = MANAGER_ID + "/schedules";
-    public static final String STAFF_ID = "/{staffId}";
 }

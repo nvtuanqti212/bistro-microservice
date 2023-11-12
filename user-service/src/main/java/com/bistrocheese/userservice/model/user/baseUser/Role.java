@@ -1,23 +1,19 @@
 package com.bistrocheese.userservice.model.user.baseUser;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class Role implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public enum Role {
+    OWNER,
+    MANAGER,
+    STAFF;
 
-    @Id
-    private Integer id;
-    private String name;
+    public static Role convertIntToRole(Integer roleId) {
+        return switch (roleId) {
+            case 0 -> OWNER;
+            case 1 -> MANAGER;
+            case 2 -> STAFF;
+            default -> null;
+        };
+    }
 }
