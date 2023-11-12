@@ -12,6 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 public class ScheduleRequest {
     private List<String> staffIds;
-    private DayOfWeek dayOfWeek;
-    private Integer shift;
+    private Integer scheduleId;
 }

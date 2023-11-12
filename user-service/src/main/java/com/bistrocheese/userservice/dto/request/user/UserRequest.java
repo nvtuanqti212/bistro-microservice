@@ -11,7 +11,7 @@ public class UserRequest {
     private String email;
     private String firstName;
     private String lastName;
-    private Integer roleId;
+    private Integer role;
     private Integer status;
     private String dateOfBirth;
     private String password;

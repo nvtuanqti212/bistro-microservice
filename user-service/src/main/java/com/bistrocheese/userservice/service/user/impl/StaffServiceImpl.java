@@ -5,7 +5,6 @@ import com.bistrocheese.userservice.model.user.Staff;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 import com.bistrocheese.userservice.repository.user.StaffRepository;
 import com.bistrocheese.userservice.service.user.StaffService;
-import com.bistrocheese.userservice.service.user.UserService;
 import com.bistrocheese.userservice.service.user.factory.StaffFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class StaffServiceImpl implements UserService, StaffService {
+public class StaffServiceImpl implements StaffService {
     private final StaffFactory staffFactory;
     private final StaffRepository staffRepository;
 

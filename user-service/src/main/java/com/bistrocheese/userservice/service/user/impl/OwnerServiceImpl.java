@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class OwnerServiceImpl implements UserService, OwnerService {
+public class OwnerServiceImpl implements OwnerService {
     private final OwnerFactory ownerFactory;
     private final OwnerRepository ownerRepository;
     private final ManagerService managerService;
@@ -43,9 +43,9 @@ public class OwnerServiceImpl implements UserService, OwnerService {
 
     @PostConstruct
     private void initRoleToServiceMap() {
-        roleToServiceMap.put(1, this);
-        roleToServiceMap.put(2, managerService);
-        roleToServiceMap.put(3, staffService);
+        roleToServiceMap.put(0, this);
+        roleToServiceMap.put(1, managerService);
+        roleToServiceMap.put(2, staffService);
     }
 
     // UserService implementation Start
@@ -84,7 +84,7 @@ public class OwnerServiceImpl implements UserService, OwnerService {
     @Override
     public void createUser(UserRequest userRequest) {
         this.checkEmailExists(userRequest.getEmail());
-        UserService userService = roleToServiceMap.get(userRequest.getRoleId());
+        UserService userService = roleToServiceMap.get(userRequest.getRole());
         if (userService == null) {
             throw new BadRequestException(MessageConstant.INVALID_ROLE_ID);
         } else {
@@ -131,8 +131,8 @@ public class OwnerServiceImpl implements UserService, OwnerService {
             Optional<? extends User> user = service.getUserById(userId);
             if (user.isPresent()) {
                 // Update Role
-                if (!Objects.equals(user.get().getRoleId(), userRequest.getRoleId())) {
-                    UserService userService = roleToServiceMap.get(userRequest.getRoleId());
+                if (!Objects.equals(user.get().getRole().ordinal(), userRequest.getRole())) {
+                    UserService userService = roleToServiceMap.get(userRequest.getRole());
                     if (userService == null) {
                         throw new BadRequestException(MessageConstant.INVALID_ROLE_ID);
                     } else {

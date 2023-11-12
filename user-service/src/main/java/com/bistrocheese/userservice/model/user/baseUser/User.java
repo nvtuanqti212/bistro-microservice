@@ -27,7 +27,7 @@ public class User implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
-    private Integer roleId;
+    private Role role;
     private Integer status;
     private String password;
     private String phoneNumber;
@@ -48,7 +48,7 @@ public class User implements Serializable {
         this.email = user.getEmail();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
-        this.roleId = user.getRoleId();
+        this.role = user.getRole();
         this.status = user.getStatus();
         this.password = user.getPassword();
         this.phoneNumber = user.getPhoneNumber();
