@@ -7,6 +7,7 @@ import com.bistrocheese.userservice.dto.response.MessageResponse;
 import com.bistrocheese.userservice.dto.response.SuccessResponse;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 import com.bistrocheese.userservice.service.user.OwnerService;
+import com.bistrocheese.userservice.service.user.StaffService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(RouteConstant.OWNER)
-public class OwnerController {
+@RequestMapping(RouteConstant.USERS)
+public class UserController {
     private final OwnerService ownerService;
+    private final StaffService staffService;
 
-    @PostMapping(RouteConstant.USERS)
+    @PostMapping()
     public ResponseEntity<MessageResponse> createUser(@RequestBody UserRequest userRequest) {
         ownerService.createUser(userRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -28,7 +30,7 @@ public class OwnerController {
         );
     }
 
-    @GetMapping(RouteConstant.USERS)
+    @GetMapping()
     public ResponseEntity<SuccessResponse<List<User>>> getAllUsers() {
         return ResponseEntity.ok(
                 new SuccessResponse<>(
@@ -64,19 +66,10 @@ public class OwnerController {
         );
     }
 
-//    @GetMapping(RouteConstant.SEARCH)
-//    public ResponseEntity<SuccessResponse<PagingResponse>> searchUser(
-//            @RequestParam(required = false) String name,
-//            @RequestParam(required = false) String role,
-//            @RequestParam(required = false) String sort,
-//            @RequestParam(name="page_number", defaultValue = "1") Integer pageNumber,
-//            @RequestParam(name="page_size", defaultValue = "10") Integer pageSize
-//    ) {
-//        return ResponseEntity.ok(
-//                new SuccessResponse<>(
-//                        MessageConstant.SEARCH_USER_SUCCESS,
-//                        ownerService.searchAllUser(name, role, sort, pageNumber, pageSize)
-//                )
-//        );
-//    }
+    //Place Order
+    @GetMapping(RouteConstant.CREATE_ORDER)
+    @ResponseStatus(HttpStatus.OK)
+    public  boolean createOrder(@PathVariable String userId) {
+        return staffService.getUserById(userId).isPresent();
+    }
 }

@@ -12,8 +12,6 @@ public class MessageConstant {
     public static final String UPDATE_USER_SUCCESS = "Updated user successfully";
     public static final String DELETE_USER_SUCCESS = "Deleted user successfully";
     public static final String SEARCH_USER_SUCCESS = "Searched user successfully";
-        // Schedule
-    public static final String ASSIGN_STAFF_TO_SCHEDULE_SUCCESS = "Assigned staff to schedule successfully";
 
     // Exception messages
     public static final String USER_NOT_FOUND = "User not found";
