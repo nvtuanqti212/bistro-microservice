@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PaymentType {
-    CASH,
-    TRANSFER;
+public enum MethodType {
+    BANK_TRANSFER,
+    DIGITAL_WALLET;
 }
-

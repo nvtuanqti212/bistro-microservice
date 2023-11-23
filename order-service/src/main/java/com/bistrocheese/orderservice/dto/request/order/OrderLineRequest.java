@@ -13,5 +13,6 @@ import java.util.UUID;
 public class OrderLineRequest {
     @JsonProperty("food_id")
     private UUID foodId;
+    @JsonProperty("quantity")
     private Integer quantity;
 }

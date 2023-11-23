@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
-    List<OrderResponse> getOrders(UUID staffId);
-    void createOrder(OrderRequest orderRequest, UUID staffId);
-    void deleteOrder(UUID orderId);
-    void createOrderLine(UUID orderId, OrderLineRequest orderLineRequest);
-    void updateOrderLine(UUID orderLineId, OrderLineRequest orderLineRequest);
-    void deleteOrderLine(UUID orderLineId);
+//    List<OrderResponse> getOrders();
+    void createOrder(OrderRequest orderRequest, String staffId);
+//    void deleteOrder(UUID orderId);
+//    void createOrderLine(UUID orderId, OrderLineRequest orderLineRequest);
+//    void updateOrderLine(UUID orderLineId, OrderLineRequest orderLineRequest);
+//    void deleteOrderLine(UUID orderLineId);
 }

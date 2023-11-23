@@ -30,18 +30,16 @@ public class Order {
     private UUID id;
 
     @JoinColumn(name = "staff_id", nullable = false)
-    private UUID staffId;
+    private String staffId;
 
     @ManyToOne
     @JoinColumn(name = "table_id", nullable = false)
     private OrderTable orderTable;
 
-    @Column(name = "order_date", nullable = false)
-    @JdbcTypeCode(SqlTypes.TIMESTAMP)
-    private Date orderDate;
+    @Column(name = "phone_cus")
+    private String phoneNumber;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     @Enumerated(EnumType.ORDINAL)
-    @JdbcTypeCode(SqlTypes.INTEGER)
     private OrderStatus status;
 }
