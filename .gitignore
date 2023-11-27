@@ -1,8 +1,7 @@
 HELP.md
 
 target/
-*/target/**
-*/target/*
+target/* /target/ .metadata tar.gz .classpath .project */.settings/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
