@@ -1,14 +1,10 @@
 package com.bistrocheese.orderservice.controller;
 
 
-import com.bistrocheese.orderservice.dto.request.order.OrderRequest;
-import com.bistrocheese.orderservice.model.User;
 import com.bistrocheese.orderservice.service.OrderService;
-import com.bistrocheese.orderservice.service.impl.OrderServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +19,8 @@ public class OrderController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> placeOrder(@PathVariable("userId") String userId,
-                                             @RequestBody OrderRequest orderRequest) {
-        orderService.createOrder(orderRequest, userId);
+    public ResponseEntity<String> placeOrder(@PathVariable("userId") String userId) {
+        orderService.createOrder(userId);
         return ResponseEntity.ok("Order Created");
     }
 

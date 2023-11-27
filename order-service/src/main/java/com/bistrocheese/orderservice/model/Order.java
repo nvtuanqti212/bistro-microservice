@@ -1,16 +1,14 @@
 package com.bistrocheese.orderservice.model;
 
+import com.bistrocheese.orderservice.constant.DateTimeConstant;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
@@ -33,14 +31,15 @@ public class Order implements Serializable {
     @JoinColumn(name = "staff_id", nullable = false)
     private String staffId;
 
-    @ManyToOne
-    @JoinColumn(name = "table_id", nullable = false)
-    private OrderTable orderTable;
-
     @Column(name = "phone_cus")
     private String phoneNumber;
 
     @Column(name = "status")
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus status;
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP default NOW()")
+    @JsonFormat(timezone = DateTimeConstant.TIMEZONE)
+    private Timestamp createdAt;
+
 }
