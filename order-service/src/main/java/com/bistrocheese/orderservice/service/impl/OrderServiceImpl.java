@@ -1,6 +1,7 @@
 package com.bistrocheese.orderservice.service.impl;
 
 
+import com.bistrocheese.orderservice.client.UserFeignClient;
 import com.bistrocheese.orderservice.constant.APIStatus;
 import com.bistrocheese.orderservice.dto.request.order.OrderRequest;
 import com.bistrocheese.orderservice.exception.CustomException;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
 @Service
@@ -23,8 +25,9 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderTableRepository orderTableRepository;
-    private final OrderLineRepository orderLineRepository;
-    Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+//    private final WebClient webClient;
+    private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+    private final UserFeignClient userFeignClient;
 
 //    @Override
 //    public List<OrderResponse> getOrders() {
@@ -41,6 +44,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void createOrder(OrderRequest orderRequest, String staffId) {
 
+//        Boolean isValidStaffId = webClient.get()
+//                .uri("http://userservice/api/v1/users/" + staffId + "/orders")
+//                .retrieve()
+//                .bodyToMono(Boolean.class)
+//                .block();
+        User user = userFeignClient.getUser(staffId);
+
+//        if (isValidStaffId == null || !isValidStaffId) {
+//            throw new CustomException(APIStatus.ORDER_NOT_FOUND);
+//        }
+        if (user == null) {
+            throw new CustomException(APIStatus.ORDER_NOT_FOUND);
+        }
+
+        logger.info("order created by: {}", user.toString());
 
         OrderTable orderTable = orderTableRepository.findById(orderRequest.getTableId()).orElseThrow(
                 () -> new CustomException(APIStatus.ORDER_TABLE_NOT_FOUND)
@@ -50,14 +68,16 @@ public class OrderServiceImpl implements OrderService {
         }
         orderTableRepository.updateTableStatusById(TableStatus.OCCUPIED, orderTable.getId());
         Order newOrder = Order.builder()
-                .staffId(staffId)
+                .staffId(user.getId())
                 .orderTable(orderTable)
                 .status(OrderStatus.PENDING)
                 .build();
-        logger.info("order: " + newOrder.getStatus());
+        logger.info("order: {}", newOrder.toString());
 
         orderRepository.save(newOrder);
     }
+
+
 
 //    @Override
 //    public void deleteOrder(UUID orderId) {

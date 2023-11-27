@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,15 +41,15 @@ public class UserController {
         );
     }
 
-    @GetMapping(RouteConstant.USER_ID)
-    public ResponseEntity<SuccessResponse<User>> getUserDetail(@PathVariable String userId) {
-        return ResponseEntity.ok(
-                new SuccessResponse<>(
-                        MessageConstant.GET_USER_DETAIL_SUCCESS,
-                        ownerService.getUserDetail(userId)
-                )
-        );
-    }
+//    @GetMapping(RouteConstant.USER_ID)
+//    public ResponseEntity<SuccessResponse<User>> getUserDetail(@PathVariable String userId) {
+//        return ResponseEntity.ok(
+//                new SuccessResponse<>(
+//                        MessageConstant.GET_USER_DETAIL_SUCCESS,
+//                        ownerService.getUserDetail(userId)
+//                )
+//        );
+//    }
 
     @DeleteMapping(RouteConstant.USER_ID)
     public ResponseEntity<MessageResponse> deleteUser(@PathVariable String userId) {
@@ -67,9 +68,9 @@ public class UserController {
     }
 
     //Place Order
-    @GetMapping(RouteConstant.CREATE_ORDER)
+    @GetMapping(RouteConstant.USER_ID)
     @ResponseStatus(HttpStatus.OK)
-    public  boolean createOrder(@PathVariable String userId) {
-        return staffService.getUserById(userId).isPresent();
+    public Optional<? extends User> getUser(@PathVariable String userId) {
+        return staffService.getUserById(userId);
     }
 }

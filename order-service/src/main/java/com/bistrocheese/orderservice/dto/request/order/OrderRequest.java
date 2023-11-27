@@ -5,6 +5,8 @@ import lombok.*;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderRequest {
     @JsonProperty("table_id")
     private Long tableId;

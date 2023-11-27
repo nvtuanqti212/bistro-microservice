@@ -36,8 +36,4 @@ public class OrderTable implements Serializable {
     @Column(name = "seat_number", nullable = false)
     @JdbcTypeCode(SqlTypes.INTEGER)
     private Integer seatNumber;
-
-    @Column(name = "name_customer")
-    @JdbcTypeCode(SqlTypes.NVARCHAR)
-    private String nameCustomer;
 }
