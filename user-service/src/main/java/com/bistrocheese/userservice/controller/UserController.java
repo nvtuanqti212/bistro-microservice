@@ -7,18 +7,21 @@ import com.bistrocheese.userservice.dto.response.MessageResponse;
 import com.bistrocheese.userservice.dto.response.SuccessResponse;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 import com.bistrocheese.userservice.service.user.OwnerService;
+import com.bistrocheese.userservice.service.user.StaffService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(RouteConstant.USERS)
 public class UserController {
     private final OwnerService ownerService;
+    private final StaffService staffService;
 
     @PostMapping()
     public ResponseEntity<MessageResponse> createUser(@RequestBody UserRequest userRequest) {
@@ -38,15 +41,15 @@ public class UserController {
         );
     }
 
-    @GetMapping(RouteConstant.USER_ID)
-    public ResponseEntity<SuccessResponse<User>> getUserDetail(@PathVariable String userId) {
-        return ResponseEntity.ok(
-                new SuccessResponse<>(
-                        MessageConstant.GET_USER_DETAIL_SUCCESS,
-                        ownerService.getUserDetail(userId)
-                )
-        );
-    }
+//    @GetMapping(RouteConstant.USER_ID)
+//    public ResponseEntity<SuccessResponse<User>> getUserDetail(@PathVariable String userId) {
+//        return ResponseEntity.ok(
+//                new SuccessResponse<>(
+//                        MessageConstant.GET_USER_DETAIL_SUCCESS,
+//                        ownerService.getUserDetail(userId)
+//                )
+//        );
+//    }
 
     @DeleteMapping(RouteConstant.USER_ID)
     public ResponseEntity<MessageResponse> deleteUser(@PathVariable String userId) {
@@ -62,5 +65,12 @@ public class UserController {
         return ResponseEntity.ok(
                 new MessageResponse(MessageConstant.UPDATE_USER_SUCCESS)
         );
+    }
+
+    //Place Order
+    @GetMapping(RouteConstant.USER_ID)
+    @ResponseStatus(HttpStatus.OK)
+    public Optional<? extends User> getUser(@PathVariable String userId) {
+        return staffService.getUserById(userId);
     }
 }

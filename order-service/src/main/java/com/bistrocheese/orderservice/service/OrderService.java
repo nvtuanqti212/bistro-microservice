@@ -1,13 +1,21 @@
 package com.bistrocheese.orderservice.service;
 
 
-import com.bistrocheese.orderservice.dto.request.OrderCreateRequest;
-import com.bistrocheese.orderservice.dto.response.OrderCreateResponse;
-import com.bistrocheese.orderservice.dto.response.OrderDeleteResponse;
+import com.bistrocheese.orderservice.dto.request.order.OrderLineRequest;
+import com.bistrocheese.orderservice.dto.request.order.OrderRequest;
+import com.bistrocheese.orderservice.dto.response.order.OrderResponse;
+import com.bistrocheese.orderservice.model.User;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
-    OrderCreateResponse createOrder(OrderCreateRequest orderResponseRequest);
-    OrderDeleteResponse deleteOrder(UUID id);
+//    List<OrderResponse> getOrders();
+    void createOrder(OrderRequest orderRequest, String staffId);
+
+
+//    void deleteOrder(UUID orderId);
+//    void createOrderLine(UUID orderId, OrderLineRequest orderLineRequest);
+//    void updateOrderLine(UUID orderLineId, OrderLineRequest orderLineRequest);
+//    void deleteOrderLine(UUID orderLineId);
 }

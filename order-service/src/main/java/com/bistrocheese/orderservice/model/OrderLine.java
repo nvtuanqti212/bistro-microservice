@@ -33,7 +33,7 @@ public class OrderLine implements Serializable {
     private UUID id;
 
     @JoinColumn(name = "food_id")
-    private UUID food;
+    private UUID foodId;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

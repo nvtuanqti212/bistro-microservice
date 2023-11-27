@@ -11,6 +11,7 @@ public class MessageConstant {
     public static final String GET_USER_DETAIL_SUCCESS = "Get user detail successfully";
     public static final String UPDATE_USER_SUCCESS = "Updated user successfully";
     public static final String DELETE_USER_SUCCESS = "Deleted user successfully";
+    public static final String SEARCH_USER_SUCCESS = "Searched user successfully";
 
     // Exception messages
     public static final String USER_NOT_FOUND = "User not found";

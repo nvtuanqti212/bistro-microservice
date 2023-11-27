@@ -8,6 +8,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,10 +20,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@DynamicInsert
-@DynamicUpdate
-@Table(name = "order")
-public class Order {
+@Table(name = "orders")
+public class Order implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -30,18 +31,16 @@ public class Order {
     private UUID id;
 
     @JoinColumn(name = "staff_id", nullable = false)
-    private UUID staffId;
+    private String staffId;
 
     @ManyToOne
     @JoinColumn(name = "table_id", nullable = false)
     private OrderTable orderTable;
 
-    @Column(name = "order_date", nullable = false)
-    @JdbcTypeCode(SqlTypes.TIMESTAMP)
-    private Date orderDate;
+    @Column(name = "phone_cus")
+    private String phoneNumber;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     @Enumerated(EnumType.ORDINAL)
-    @JdbcTypeCode(SqlTypes.INTEGER)
     private OrderStatus status;
 }

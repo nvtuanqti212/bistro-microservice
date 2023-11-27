@@ -22,21 +22,24 @@ import java.util.UUID;
 @DynamicUpdate
 @Table(name = "payment")
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @Column(name = "type", nullable = false)
 
-    @Column(name = "payment_type", nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    @JdbcTypeCode(SqlTypes.INTEGER)
     private PaymentType paymentType;
 
-    @Column(name = "total", nullable = false)
-    @JdbcTypeCode(SqlTypes.BIGINT)
-    private Long total;
+    @ManyToOne
+    @JoinColumn(name = "method_id")
+    private TransferMethod methodId;
+
+    @Column(name = "cus_nme",nullable = false)
+    private String customerName;
+
+    @Column(name = "phone_num",nullable = false)
+    private String phoneNumber;
 }

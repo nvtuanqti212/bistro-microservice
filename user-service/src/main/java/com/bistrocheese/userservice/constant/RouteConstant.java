@@ -7,4 +7,8 @@ public class RouteConstant {
     // Owner
     public static final String USERS = API + "/users";
     public static final String USER_ID = "/{userId}";
+
+    // Create Order
+    public static final String CREATE_ORDER = USER_ID + "/orders";
+
 }
