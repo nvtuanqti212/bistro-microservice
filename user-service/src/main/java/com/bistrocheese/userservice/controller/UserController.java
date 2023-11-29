@@ -6,6 +6,7 @@ import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.dto.response.MessageResponse;
 import com.bistrocheese.userservice.dto.response.SuccessResponse;
 import com.bistrocheese.userservice.model.user.baseUser.User;
+import com.bistrocheese.userservice.service.order.OrderService;
 import com.bistrocheese.userservice.service.user.OwnerService;
 import com.bistrocheese.userservice.service.user.StaffService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping(RouteConstant.USERS)
 public class UserController {
+
     private final OwnerService ownerService;
     private final StaffService staffService;
+    private final OrderService orderService;
+
 
     @PostMapping()
     public ResponseEntity<MessageResponse> createUser(@RequestBody UserRequest userRequest) {
@@ -40,16 +44,6 @@ public class UserController {
                 )
         );
     }
-
-//    @GetMapping(RouteConstant.USER_ID)
-//    public ResponseEntity<SuccessResponse<User>> getUserDetail(@PathVariable String userId) {
-//        return ResponseEntity.ok(
-//                new SuccessResponse<>(
-//                        MessageConstant.GET_USER_DETAIL_SUCCESS,
-//                        ownerService.getUserDetail(userId)
-//                )
-//        );
-//    }
 
     @DeleteMapping(RouteConstant.USER_ID)
     public ResponseEntity<MessageResponse> deleteUser(@PathVariable String userId) {
@@ -72,5 +66,13 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Optional<? extends User> getUser(@PathVariable String userId) {
         return staffService.getUserById(userId);
+    }
+
+    @PostMapping(RouteConstant.CREATE_ORDER)
+    public ResponseEntity<MessageResponse> placeOrder(@PathVariable("userId") String userId) {
+        orderService.createOrder(userId);
+        return ResponseEntity.ok(
+                new MessageResponse(MessageConstant.CREATE_ORDER_SUCCESS)
+        );
     }
 }
