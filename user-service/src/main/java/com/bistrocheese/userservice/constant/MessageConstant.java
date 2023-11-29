@@ -21,4 +21,7 @@ public class MessageConstant {
     public static final String INVALID_DATE_OF_BIRTH = "Invalid date of birth";
     public static final String INVALID_PAGE_NUMBER = "Page number must be greater than 0";
     public static final String INVALID_PAGE_SIZE = "Page size must be greater than 0";
+
+    //Order
+    public static final String CREATE_ORDER_SUCCESS = "Created order successfully";
 }

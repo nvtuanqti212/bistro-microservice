@@ -1,7 +1,6 @@
 package com.bistrocheese.orderservice.service.impl;
 
 
-import com.bistrocheese.orderservice.client.UserFeignClient;
 import com.bistrocheese.orderservice.constant.APIStatus;
 import com.bistrocheese.orderservice.exception.CustomException;
 import com.bistrocheese.orderservice.model.*;
@@ -28,21 +27,11 @@ public class OrderServiceImpl implements OrderService {
     private final OrderLineRepository orderLineRepository;
     private final OrderLineService orderLineService;
     private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
-    private final UserFeignClient userFeignClient;
 
     @Override
     public void createOrder(String staffId) {
-
-        User user = userFeignClient.getUser(staffId);
-
-        if (user == null) {
-            throw new CustomException(APIStatus.ORDER_NOT_FOUND);
-        }
-
-        logger.info("order created by: {}", user.toString());
-
         Order newOrder = Order.builder()
-                .staffId(user.getId())
+                .staffId(staffId)
                 .status(OrderStatus.PENDING)
                 .build();
         logger.info("order: {}", newOrder.toString());
