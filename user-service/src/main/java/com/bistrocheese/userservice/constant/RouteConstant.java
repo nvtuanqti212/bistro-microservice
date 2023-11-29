@@ -1,8 +1,8 @@
 package com.bistrocheese.userservice.constant;
 
 public class RouteConstant {
-    public static final String VERSION = "/v1";
-    public static final String API = "/api" + VERSION;
+    public static final String SERVICE = "/user-service";
+    public static final String API = SERVICE + "/api";
 
     // Owner
     public static final String USERS = API + "/users";

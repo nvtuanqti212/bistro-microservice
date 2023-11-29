@@ -1,5 +1,6 @@
 package com.bistrocheese.foodservice.controller;
 
+import com.bistrocheese.foodservice.constant.RouteConstant;
 import com.bistrocheese.foodservice.dto.request.FoodRequest;
 import com.bistrocheese.foodservice.dto.response.FoodResponse;
 import com.bistrocheese.foodservice.service.FoodService;
@@ -10,18 +11,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/food")
+@RequestMapping(RouteConstant.FOODS)
 @RequiredArgsConstructor
 public class FoodController {
     private final FoodService foodService;
 
-    @PostMapping
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public FoodResponse createFood(@RequestBody FoodRequest request) {
         return foodService.createFood(request);
     }
 
-    @GetMapping
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public List<FoodResponse> getAllFoods() {
         return foodService.getAllFoods();
