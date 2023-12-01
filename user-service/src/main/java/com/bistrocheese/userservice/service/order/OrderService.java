@@ -1,5 +1,7 @@
 package com.bistrocheese.userservice.service.order;
 
+import reactor.core.publisher.Mono;
+
 public interface OrderService {
-    void createOrder(String staffId);
+    public String createOrder(String staffId);
 }

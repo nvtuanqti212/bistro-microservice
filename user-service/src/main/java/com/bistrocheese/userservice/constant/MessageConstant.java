@@ -24,4 +24,7 @@ public class MessageConstant {
 
     //Order
     public static final String CREATE_ORDER_SUCCESS = "Created order successfully";
+
+    //circuit breaker
+
 }
