@@ -6,15 +6,23 @@ import com.bistrocheese.userservice.exception.BadRequestException;
 import com.bistrocheese.userservice.model.user.Owner;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 import com.bistrocheese.userservice.repository.user.OwnerRepository;
+import com.bistrocheese.userservice.service.order.impl.OrderServiceImpl;
 import com.bistrocheese.userservice.service.user.ManagerService;
 import com.bistrocheese.userservice.service.user.OwnerService;
 import com.bistrocheese.userservice.service.user.StaffService;
 import com.bistrocheese.userservice.service.user.UserService;
 import com.bistrocheese.userservice.service.user.factory.OwnerFactory;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static com.bistrocheese.userservice.constant.ServiceConstant.*;
 
 @Service
 public class OwnerServiceImpl implements OwnerService {
@@ -25,6 +33,9 @@ public class OwnerServiceImpl implements OwnerService {
 
     private final Map<Integer, UserService> roleToServiceMap;
     private final UserService[] services;
+
+    private final Logger logger = LoggerFactory.getLogger(OwnerServiceImpl.class);
+
 
     public OwnerServiceImpl(
             OwnerFactory ownerFactory,
@@ -59,9 +70,18 @@ public class OwnerServiceImpl implements OwnerService {
         ownerRepository.save((Owner) ownerFactory.create(userRequest));
     }
 
+    /** Bulkhead annotation is used to limit the number of concurrent calls to a particular method.
+     *  In this case, the maximum number of concurrent calls to getUsers() is 5.
+     *  If the number of concurrent calls exceeds 5, the fallback method getUsersFallback() will be called.
+     *  The fallback method returns a default user.
+     *  */
     @Override
+    @CircuitBreaker(name = USER_SERVICE_CB, fallbackMethod = "getUsersFallback")
+    @Bulkhead(name = USER_SERVICE_BULKHEAD, type = Bulkhead.Type.THREADPOOL,fallbackMethod = "getUsersFallback")
+    @RateLimiter(name = USER_SERVICE_RATE_LIMITER, fallbackMethod = "getUsersFallback")
     public List<User> getUsers() {
-        return  new ArrayList<>(ownerRepository.findAll());
+        logger.info("Getting users...");
+        return new ArrayList<>(ownerRepository.findAll());
     }
 
     @Override
@@ -158,5 +178,22 @@ public class OwnerServiceImpl implements OwnerService {
                 throw new BadRequestException(MessageConstant.EMAIL_ALREADY_EXISTS);
             }
         }
+    }
+
+    private List<User> getUsersFallback(Exception e) {
+        logger.error("Error getting users: {}", e.getMessage());
+        User defaultUser = User.builder()
+                .id( UUID.randomUUID().toString())
+                .email("nguyenvanA@gmail.com")
+                .firstName("Nguyen Van")
+                .lastName("A")
+                .role(null)
+                .status(0)
+                .password("123456")
+                .phoneNumber("0123456789")
+                .build();
+        return new ArrayList<>(
+                List.of(defaultUser)
+        );
     }
 }
