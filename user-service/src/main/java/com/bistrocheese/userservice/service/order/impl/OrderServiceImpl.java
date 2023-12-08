@@ -31,7 +31,6 @@ public class OrderServiceImpl implements OrderService {
     @CircuitBreaker(name = ORDER_SERVICE_CB, fallbackMethod = "fallback")
     public CompletableFuture<String> createOrder(String staffId) throws InterruptedException {
         logger.info("Creating order...");
-        Thread.sleep(3000);
         staffRepository.findById(staffId).orElseThrow(
                 () -> new RuntimeException("Staff not found")
         );
