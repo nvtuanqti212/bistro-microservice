@@ -42,8 +42,15 @@ public class ApiGatewayApplication {
                         )
                         .collect(Collectors.toList())));
 
+        apiKeys.add(new ApiKey(
+                AppConstants.API_KEY_FOOD,
+                Stream.of(
+                                AppConstants.FOOD_SERVICE_KEY
+                        )
+                        .collect(Collectors.toList())));
+
         List<Object> lists = redisHashComponent.hValues(AppConstants.RECORD_KEY);
-        if (lists.isEmpty()) {
+        if (lists.size() != apiKeys.size()) {
             apiKeys.forEach(apiKey -> redisHashComponent.hSet(AppConstants.RECORD_KEY, apiKey.getApiKey(), apiKey));
         }
     }

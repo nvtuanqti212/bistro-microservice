@@ -36,7 +36,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
         String routeId = route != null ? route.getId() : null;
 
-        if (routeId == null || CollectionUtils.isEmpty(apiKeysHeader) || isAuthorized(routeId, apiKeysHeader.get(0))) {
+        if (routeId == null || CollectionUtils.isEmpty(apiKeysHeader) || !isAuthorized( apiKeysHeader.get(0), routeId)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "you can not access this service, please check your api key");
         }
         return chain.filter(exchange);
@@ -49,10 +49,12 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
     private boolean isAuthorized(String apiKey, String routeId) {
         Object apiKeyObject = redisHashComponent.hGet(AppConstants.RECORD_KEY, apiKey);
+        log.info("apiKeyObject: {}", apiKeyObject);
         if (apiKeyObject != null) {
             ApiKey key = MapperUtils.objectMapper(apiKeyObject, ApiKey.class);
             return key.getServices().contains(routeId);
         } else {
+            log.info("apiKeyObject is null");
             return false;
         }
     }
