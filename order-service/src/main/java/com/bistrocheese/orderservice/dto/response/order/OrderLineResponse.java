@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -14,11 +15,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderLineResponse {
     private UUID id;
-    @JsonProperty("food_id")
-    private UUID foodId;
-//    @JsonProperty("food_name")
-//    private String foodName;
-//    @JsonProperty("food_price")
-//    private Long foodPrice;
+    private String name;
+    private String image;
+    private BigDecimal price;
     private Integer quantity;
 }

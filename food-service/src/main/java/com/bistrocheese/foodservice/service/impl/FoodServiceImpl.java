@@ -3,28 +3,25 @@ package com.bistrocheese.foodservice.service.impl;
 import com.bistrocheese.foodservice.constant.APIStatus;
 import com.bistrocheese.foodservice.dto.request.FoodRequest;
 import com.bistrocheese.foodservice.dto.response.FoodResponse;
-import com.bistrocheese.foodservice.dto.response.PagingFoodResponse;
 import com.bistrocheese.foodservice.exception.CustomException;
 import com.bistrocheese.foodservice.model.Category;
 import com.bistrocheese.foodservice.model.Food;
 import com.bistrocheese.foodservice.repository.CategoryRepo;
-import com.bistrocheese.foodservice.repository.FoodRepo;
-import com.bistrocheese.foodservice.repository.specification.FoodSpecification;
+import com.bistrocheese.foodservice.repository.FoodRepository;
 import com.bistrocheese.foodservice.service.FoodService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
 
+import static org.springframework.beans.BeanUtils.copyProperties;
+
 @Service
 @RequiredArgsConstructor
 public class FoodServiceImpl implements FoodService {
 
-    private final FoodRepo foodRepository;
+    private final FoodRepository foodRepository;
     private final CategoryRepo categoryRepository;
     @Override
     public List<FoodResponse> getAllFoods() {
@@ -50,9 +47,7 @@ public class FoodServiceImpl implements FoodService {
                 .category(category)
                 .description(request.getDescription())
                 .price(request.getPrice())
-                .productImage(request.getProductImage())
-                .createdDate(new Date())
-                .lastModifiedDate(new Date())
+                .image(request.getImage())
                 .status(request.getStatus())
                 .build();
 
@@ -78,17 +73,8 @@ public class FoodServiceImpl implements FoodService {
         Category updateCategory = categoryRepository.findById(updatingFood.getCategory()).orElseThrow(
                 () -> new CustomException(APIStatus.CATEGORY_NOT_FOUND)
         );
-        Date lastModifiedDate = new Date();
-        foodRepository.updateFoodById(
-                updatingFood.getName(),
-                updateCategory,
-                updatingFood.getDescription(),
-                updatingFood.getProductImage(),
-                updatingFood.getPrice(),
-                lastModifiedDate,
-                updatingFood.getStatus(),
-                existingFood.getId()
-        );
+        copyProperties(updatingFood, existingFood);
+        foodRepository.save(existingFood);
     }
 
     @Override
@@ -98,34 +84,12 @@ public class FoodServiceImpl implements FoodService {
         ));
     }
 
-    @Override
-    public PagingFoodResponse searchFood(String category, String searchKey, BigDecimal minPrice, BigDecimal maxPrice, Integer sortCase, Boolean isAscSort, Integer pageNumber, Integer pageSize) {
-        if (pageSize < 1 || pageNumber < 1) {
-            throw new CustomException(APIStatus.ERR_PAGINATION);
-        }
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        Page<Food> foodPage = foodRepository.findAll(
-                new FoodSpecification(
-                        category,
-                        searchKey,
-                        minPrice,
-                        maxPrice,
-                        sortCase,
-                        isAscSort
-                ), pageable);
-        return new PagingFoodResponse(
-                foodPage.getContent(),
-                foodPage.getTotalElements(),
-                foodPage.getTotalPages(),
-                foodPage.getNumber() + 1
-        );
-    }
     private FoodResponse mapToFoodResponse(Food product) {
         return FoodResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
-                .foodImage(product.getProductImage())
+                .foodImage(product.getImage())
                 .price(product.getPrice())
                 .status(product.getStatus())
                 .build();

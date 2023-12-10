@@ -1,10 +1,9 @@
-package com.bistrocheese.foodservice.dto.response;
+package com.bistrocheese.userservice.dto.response;
 
-import com.bistrocheese.foodservice.model.Category;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.UUID;
