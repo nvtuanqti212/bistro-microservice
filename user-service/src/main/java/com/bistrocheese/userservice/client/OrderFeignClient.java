@@ -1,5 +1,6 @@
 package com.bistrocheese.userservice.client;
 
+import com.bistrocheese.userservice.dto.request.order.OrderCreateRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +12,7 @@ import static com.bistrocheese.userservice.constant.ServiceConstant.ORDER_SERVIC
 @FeignClient(ORDER_SERVICE)
 public interface OrderFeignClient {
     @RequestMapping(value = "order-service/api/orders", method = RequestMethod.GET)
-    public ResponseEntity<String> placeOrder(@RequestBody String staffId);
+    ResponseEntity<String> placeOrder(@RequestBody OrderCreateRequest request);
 }
 
 

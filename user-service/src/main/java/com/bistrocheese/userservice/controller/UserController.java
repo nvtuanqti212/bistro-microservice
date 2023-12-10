@@ -2,6 +2,7 @@ package com.bistrocheese.userservice.controller;
 
 import com.bistrocheese.userservice.constant.MessageConstant;
 import com.bistrocheese.userservice.constant.RouteConstant;
+import com.bistrocheese.userservice.dto.request.order.OrderCreateRequest;
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.dto.response.MessageResponse;
 import com.bistrocheese.userservice.dto.response.SuccessResponse;
@@ -83,8 +84,8 @@ public class UserController {
     }
 
     @PostMapping(RouteConstant.CREATE_ORDER)
-    public ResponseEntity<MessageResponse> placeOrder(@PathVariable("userId") String userId) throws InterruptedException {
-        String message = orderService.createOrder(userId).join();
+    public ResponseEntity<MessageResponse> placeOrder(@RequestBody OrderCreateRequest req) throws InterruptedException {
+        String message = orderService.createOrder(req).join();
         return ResponseEntity.ok(
                 new MessageResponse(message)
         );

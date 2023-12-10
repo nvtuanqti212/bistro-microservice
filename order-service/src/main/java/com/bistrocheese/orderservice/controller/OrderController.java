@@ -2,6 +2,7 @@ package com.bistrocheese.orderservice.controller;
 
 
 import com.bistrocheese.orderservice.constant.RouteConstant;
+import com.bistrocheese.orderservice.dto.request.OrderCreateRequest;
 import com.bistrocheese.orderservice.model.Order;
 import com.bistrocheese.orderservice.repository.OrderRepository;
 import com.bistrocheese.orderservice.service.OrderService;
@@ -30,8 +31,8 @@ public class OrderController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> placeOrder(@RequestBody String userId) {
-        orderService.createOrder(userId);
+    public ResponseEntity<String> placeOrder(@RequestBody OrderCreateRequest request) {
+        orderService.createOrder(request);
         return ResponseEntity.ok("Order Created");
     }
 

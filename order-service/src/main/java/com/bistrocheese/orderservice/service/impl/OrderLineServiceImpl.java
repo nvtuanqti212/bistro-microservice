@@ -2,7 +2,7 @@ package com.bistrocheese.orderservice.service.impl;
 
 
 import com.bistrocheese.orderservice.constant.APIStatus;
-import com.bistrocheese.orderservice.dto.request.order.OrderLineRequest;
+import com.bistrocheese.orderservice.dto.request.OrderLineRequest;
 import com.bistrocheese.orderservice.exception.CustomException;
 import com.bistrocheese.orderservice.model.Order;
 import com.bistrocheese.orderservice.model.OrderLine;
@@ -30,7 +30,7 @@ public class OrderLineServiceImpl implements OrderLineService {
         );
         //TODO: check if food is available in inventory
         newOrderLine.setOrder(order);
-//        newOrderLine.setFood(food);
+        newOrderLine.setFoodId(req.getFoodId());
         newOrderLine.setQuantity(req.getQuantity());
 
         repository.save(newOrderLine);

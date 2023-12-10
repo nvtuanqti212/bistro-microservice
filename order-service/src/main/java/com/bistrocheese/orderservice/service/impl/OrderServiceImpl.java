@@ -2,6 +2,8 @@ package com.bistrocheese.orderservice.service.impl;
 
 
 import com.bistrocheese.orderservice.constant.APIStatus;
+import com.bistrocheese.orderservice.dto.request.OrderCreateRequest;
+import com.bistrocheese.orderservice.dto.request.OrderLineRequest;
 import com.bistrocheese.orderservice.exception.CustomException;
 import com.bistrocheese.orderservice.model.*;
 import com.bistrocheese.orderservice.repository.OrderLineRepository;
@@ -13,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,14 +34,26 @@ public class OrderServiceImpl implements OrderService {
     private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Override
-    public void createOrder(String staffId) {
+    @Transactional
+    public void createOrder(OrderCreateRequest req) {
+        String staffId = req.getStaffId();
+
+        Flux<OrderLineRequest> orderLineList = Flux.fromIterable(req.getOrderLines());
         Order newOrder = Order.builder()
                 .staffId(staffId)
                 .status(OrderStatus.PENDING)
                 .build();
-        logger.info("order: {}", newOrder.toString());
+        logger.info("orderLine: {}", orderLineList);
 
-        orderRepository.save(newOrder);
+        UUID createdOrderId = orderRepository.save(newOrder).getId();
+
+        orderLineList.flatMap(orderLineRequest -> {
+            // create each OrderLine asynchronously
+            return Mono.fromRunnable(() -> {
+                orderLineService.create(createdOrderId, orderLineRequest);
+            }).subscribeOn(Schedulers.boundedElastic());
+        }).subscribe();
+
     }
 
     @Override

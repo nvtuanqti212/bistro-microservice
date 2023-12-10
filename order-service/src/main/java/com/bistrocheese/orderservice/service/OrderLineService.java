@@ -1,6 +1,6 @@
 package com.bistrocheese.orderservice.service;
 
-import com.bistrocheese.orderservice.dto.request.order.OrderLineRequest;
+import com.bistrocheese.orderservice.dto.request.OrderLineRequest;
 import com.bistrocheese.orderservice.model.OrderLine;
 
 import java.util.UUID;

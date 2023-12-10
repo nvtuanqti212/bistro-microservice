@@ -9,6 +9,6 @@ public class RouteConstant {
     public static final String USER_ID = "/{userId}";
 
     // Create Order
-    public static final String CREATE_ORDER = USER_ID + "/orders";
+    public static final String CREATE_ORDER = "/orders";
 
 }

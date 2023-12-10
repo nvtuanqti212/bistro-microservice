@@ -21,8 +21,4 @@ public interface FoodService {
     void updateFood(UUID foodId, FoodRequest updatingFood);
 
     FoodResponse getDetailFood(UUID foodId);
-
-    PagingFoodResponse searchFood(String category, String searchKey, BigDecimal minPrice, BigDecimal maxPrice,
-                                  Integer sortCase, Boolean isAscSort, Integer pageNumber,
-                                  Integer pageSize);
 }

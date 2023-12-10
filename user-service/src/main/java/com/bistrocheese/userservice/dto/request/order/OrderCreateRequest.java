@@ -1,4 +1,4 @@
-package com.bistrocheese.orderservice.dto.request;
+package com.bistrocheese.userservice.dto.request.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
