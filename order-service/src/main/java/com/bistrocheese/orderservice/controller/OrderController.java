@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,11 +25,6 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderRepository orderRepository;
 
-    @GetMapping()
-    public List<Order> getOrders() {
-        return orderRepository.findAll();
-    }
-
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> placeOrder(@RequestBody OrderCreateRequest request) {
@@ -36,6 +32,16 @@ public class OrderController {
         return ResponseEntity.ok("Order Created");
     }
 
-    //TODO: Get Orders
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<Order>> getOrdersByUser(@RequestBody String userId) {
+        return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
+    }
+
+    @GetMapping(RouteConstant.ID)
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Order> getOrderById(@PathVariable("id") UUID orderId) {
+        return ResponseEntity.ok(orderService.getById(orderId));
+    }
     //TODO: Delete Order
 }

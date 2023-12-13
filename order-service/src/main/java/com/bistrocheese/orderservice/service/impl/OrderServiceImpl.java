@@ -19,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,21 +39,20 @@ public class OrderServiceImpl implements OrderService {
     public void createOrder(OrderCreateRequest req) {
         String staffId = req.getStaffId();
 
-        Flux<OrderLineRequest> orderLineList = Flux.fromIterable(req.getOrderLines());
+        List<OrderLineRequest> orderLineList = req.getOrderLines();
+
         Order newOrder = Order.builder()
                 .staffId(staffId)
                 .status(OrderStatus.PENDING)
+                .totalPrice(BigDecimal.valueOf(0))
                 .build();
         logger.info("orderLine: {}", orderLineList);
 
         UUID createdOrderId = orderRepository.save(newOrder).getId();
 
-        orderLineList.flatMap(orderLineRequest -> {
-            // create each OrderLine asynchronously
-            return Mono.fromRunnable(() -> {
-                orderLineService.create(createdOrderId, orderLineRequest);
-            }).subscribeOn(Schedulers.boundedElastic());
-        }).subscribe();
+        orderLineList.forEach(orderLine -> {
+            orderLineService.create(createdOrderId, orderLine);
+        });
 
     }
 
@@ -77,4 +77,8 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
+    @Override
+    public List<Order> getOrdersByUserId(String userId) {
+        return orderRepository.findAllByStaffId(userId);
+    }
 }
