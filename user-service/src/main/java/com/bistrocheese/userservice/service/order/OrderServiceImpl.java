@@ -1,11 +1,12 @@
-package com.bistrocheese.userservice.service.order.impl;
+package com.bistrocheese.userservice.service.order;
 
 import com.bistrocheese.userservice.client.FoodFeignClient;
 import com.bistrocheese.userservice.client.OrderFeignClient;
 import com.bistrocheese.userservice.dto.request.order.OrderCreateRequest;
 import com.bistrocheese.userservice.dto.request.order.OrderLineRequest;
+import com.bistrocheese.userservice.dto.response.FoodResponse;
+import com.bistrocheese.userservice.dto.response.OrderResponse;
 import com.bistrocheese.userservice.repository.user.StaffRepository;
-import com.bistrocheese.userservice.service.order.OrderService;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -13,10 +14,10 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Bulkhead(name = ORDER_SERVICE_BULKHEAD, type = Bulkhead.Type.THREADPOOL, fallbackMethod = "fallback")
     @CircuitBreaker(name = ORDER_SERVICE_CB, fallbackMethod = "fallback")
+    @Transactional(rollbackFor = CannotAcquireLockException.class)
     public CompletableFuture<String> createOrder(OrderCreateRequest request){
         String staffId = request.getStaffId();
         List<OrderLineRequest> orderLines = request.getOrderLines();
@@ -46,19 +48,23 @@ public class OrderServiceImpl implements OrderService {
                 () -> new RuntimeException("Staff not found")
         );
 
-        Flux.fromIterable(orderLines)
-                .flatMap(orderLine -> {
-                    UUID foodId = orderLine.getFoodId();
-                    if (!checkIfFoodExist(foodId)) {
-                        return Flux.error(new RuntimeException("Food not found"));
-                    }
-                    return Mono.just(orderLine);
-                })
-                .collectList()
-                .block();
+        orderLines.forEach(orderLine -> {
+            UUID foodId = orderLine.getFoodId();
+            if (checkIfFoodExist(foodId).getStatusCode().isError()) {
+                throw new RuntimeException("Food not found");
+            }
+            FoodResponse foodResponse = checkIfFoodExist(foodId).getBody();
+            assert foodResponse != null;
+            orderLine.setPrice(foodResponse.getPrice());
+        });
 
         ResponseEntity<String> res = orderFeignClient.placeOrder(request);
         return CompletableFuture.completedFuture(res.getBody());
+    }
+
+    @Override
+    public OrderResponse getOrderById(String orderId) {
+        return orderFeignClient.getOrderById(UUID.fromString(orderId)).getBody();
     }
 
     private CompletableFuture<String> fallback(OrderCreateRequest request, CallNotPermittedException e) {
@@ -69,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
         return CompletableFuture.completedFuture("Recovered specific BulkheadFullException: " + e.toString());
     }
 
-    private boolean checkIfFoodExist(UUID foodId) {
-        return foodFeignClient.getDetailFood(foodId) != null;
+    private ResponseEntity<FoodResponse> checkIfFoodExist(UUID foodId) {
+        return foodFeignClient.getDetailFood(foodId);
     }
 }

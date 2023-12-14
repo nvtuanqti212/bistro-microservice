@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -37,6 +38,9 @@ public class Order implements Serializable {
     @Column(name = "status")
     @Enumerated(EnumType.ORDINAL)
     private OrderStatus status;
+
+    @Column(name = "total_price")
+    private BigDecimal totalPrice;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP default NOW()")
     @JsonFormat(timezone = DateTimeConstant.TIMEZONE)

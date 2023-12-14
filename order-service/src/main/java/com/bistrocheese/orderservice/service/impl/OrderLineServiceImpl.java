@@ -28,10 +28,12 @@ public class OrderLineServiceImpl implements OrderLineService {
         Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> new CustomException(APIStatus.ORDER_NOT_FOUND)
         );
+
         //TODO: check if food is available in inventory
         newOrderLine.setOrder(order);
         newOrderLine.setFoodId(req.getFoodId());
         newOrderLine.setQuantity(req.getQuantity());
+        newOrderLine.calculatePrice(req.getPrice());
 
         repository.save(newOrderLine);
     }
