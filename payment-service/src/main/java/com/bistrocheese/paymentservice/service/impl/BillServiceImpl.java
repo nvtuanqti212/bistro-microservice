@@ -5,12 +5,15 @@ import com.bistrocheese.paymentservice.dto.request.BillRequest;
 import com.bistrocheese.paymentservice.exception.CustomException;
 import com.bistrocheese.paymentservice.model.Bill;
 import com.bistrocheese.paymentservice.model.Discount;
+import com.bistrocheese.paymentservice.publisher.BillPublisher;
 import com.bistrocheese.paymentservice.repository.BillRepository;
 import com.bistrocheese.paymentservice.service.BillService;
 import com.bistrocheese.paymentservice.service.DiscountService;
 import com.bistrocheese.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +28,8 @@ public class BillServiceImpl implements BillService {
 
     private final DiscountService discountService;
     private final PaymentService paymentService;
+    private final BillPublisher billPublisher;
+    private final static Logger logger = LogManager.getLogger(BillServiceImpl.class);
 
     @Override
     public void create(BillRequest billRequest) {
@@ -57,9 +62,13 @@ public class BillServiceImpl implements BillService {
 
 //        bill.setCusIn(order.getCreatedAt());
         bill.setCusOut(new Date());
-
-        billRepository.save(bill);
+        try {
+            billPublisher.completeOrder(billRequest.getOrderId());
+        } catch (Exception e) {
+            logger.error("Error payment service while sending message to queue: {}", e.getMessage());
+        }
         //TODO: Update order status
-        //TODO: Update table status
+        billRepository.save(bill);
+
     }
 }
