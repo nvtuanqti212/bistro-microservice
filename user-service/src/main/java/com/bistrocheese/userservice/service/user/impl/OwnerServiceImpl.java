@@ -6,7 +6,6 @@ import com.bistrocheese.userservice.exception.BadRequestException;
 import com.bistrocheese.userservice.model.user.Owner;
 import com.bistrocheese.userservice.model.user.baseUser.User;
 import com.bistrocheese.userservice.repository.user.OwnerRepository;
-import com.bistrocheese.userservice.service.order.impl.OrderServiceImpl;
 import com.bistrocheese.userservice.service.user.ManagerService;
 import com.bistrocheese.userservice.service.user.OwnerService;
 import com.bistrocheese.userservice.service.user.StaffService;

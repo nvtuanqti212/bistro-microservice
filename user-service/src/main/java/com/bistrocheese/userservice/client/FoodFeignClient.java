@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.UUID;
 
-@FeignClient("foodservice")
+import static com.bistrocheese.userservice.constant.ServiceConstant.FOOD_SERVICE;
+
+@FeignClient(FOOD_SERVICE)
 public interface FoodFeignClient {
-    //TODO: Fix this
     @RequestMapping(value = "food-service/api/foods/{foodId}", method = RequestMethod.GET)
     ResponseEntity<FoodResponse> getDetailFood(@PathVariable("foodId") UUID foodId);
 }

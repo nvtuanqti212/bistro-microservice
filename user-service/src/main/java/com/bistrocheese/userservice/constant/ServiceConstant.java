@@ -3,6 +3,7 @@ package com.bistrocheese.userservice.constant;
 public class ServiceConstant {
     public static final String ORDER_SERVICE = "orderservice";
     public static final String FOOD_SERVICE = "foodservice";
+    public static final String PAYMENT_SERVICE = "paymentservice";
     public static final String ORDER_SERVICE_BULKHEAD = "orderServiceBulkhead";
     public static final String ORDER_SERVICE_CB = "orderServiceCB";
 

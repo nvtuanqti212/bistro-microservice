@@ -2,17 +2,13 @@ package com.bistrocheese.userservice.controller;
 
 import com.bistrocheese.userservice.constant.MessageConstant;
 import com.bistrocheese.userservice.constant.RouteConstant;
-import com.bistrocheese.userservice.dto.request.order.OrderCreateRequest;
 import com.bistrocheese.userservice.dto.request.user.UserRequest;
 import com.bistrocheese.userservice.dto.response.MessageResponse;
 import com.bistrocheese.userservice.dto.response.SuccessResponse;
 import com.bistrocheese.userservice.model.user.baseUser.User;
-import com.bistrocheese.userservice.service.order.OrderService;
 import com.bistrocheese.userservice.service.user.OwnerService;
 import com.bistrocheese.userservice.service.user.StaffService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +23,7 @@ public class UserController {
 
     private final OwnerService ownerService;
     private final StaffService staffService;
-    private final OrderService orderService;
 
-    private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
 
@@ -72,13 +66,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Optional<? extends User> getUser(@PathVariable String userId) {
         return staffService.getUserById(userId);
-    }
-
-    @PostMapping(RouteConstant.CREATE_ORDER)
-    public ResponseEntity<MessageResponse> placeOrder(@RequestBody OrderCreateRequest req) throws InterruptedException {
-        String message = orderService.createOrder(req).join();
-        return ResponseEntity.ok(
-                new MessageResponse(message)
-        );
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -42,4 +43,12 @@ public class OrderLine implements Serializable {
     @Column(name = "quantity")
     @JdbcTypeCode(SqlTypes.INTEGER)
     private Integer quantity;
+
+    @Column(name = "price", nullable = false)
+    @JdbcTypeCode(SqlTypes.DECIMAL)
+    private BigDecimal price;
+
+    public void calculatePrice(BigDecimal foodPrice) {
+        this.price = foodPrice.multiply(BigDecimal.valueOf(this.quantity));
+    }
 }

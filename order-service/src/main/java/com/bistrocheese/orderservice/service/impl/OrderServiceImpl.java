@@ -13,14 +13,15 @@ import com.bistrocheese.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
+import static com.bistrocheese.orderservice.constant.RabbitConstant.ROUTING_QUEUE;
 
 
 @Service
@@ -38,22 +39,38 @@ public class OrderServiceImpl implements OrderService {
     public void createOrder(OrderCreateRequest req) {
         String staffId = req.getStaffId();
 
-        Flux<OrderLineRequest> orderLineList = Flux.fromIterable(req.getOrderLines());
+        List<OrderLineRequest> orderLineList = req.getOrderLines();
+
         Order newOrder = Order.builder()
                 .staffId(staffId)
                 .status(OrderStatus.PENDING)
+                .totalPrice(BigDecimal.valueOf(0))
                 .build();
         logger.info("orderLine: {}", orderLineList);
 
         UUID createdOrderId = orderRepository.save(newOrder).getId();
 
-        orderLineList.flatMap(orderLineRequest -> {
-            // create each OrderLine asynchronously
-            return Mono.fromRunnable(() -> {
-                orderLineService.create(createdOrderId, orderLineRequest);
-            }).subscribeOn(Schedulers.boundedElastic());
-        }).subscribe();
+        orderLineList.forEach(orderLine -> {
+            orderLineService.create(createdOrderId, orderLine);
+        });
 
+    }
+
+    @Override
+    @RabbitListener(queues = {ROUTING_QUEUE})
+    public void completeOrder(String message) {
+
+        testError();
+
+        UUID orderId = UUID.fromString(message);
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                () -> new CustomException(APIStatus.ORDER_NOT_FOUND)
+        );
+
+        logger.info("At orderServiceIml, order completed: {}", order);
+
+        order.setStatus(OrderStatus.COMPLETED);
+        orderRepository.save(order);
     }
 
     @Override
@@ -77,4 +94,12 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
+    @Override
+    public List<Order> getOrdersByUserId(String userId) {
+        return orderRepository.findAllByStaffId(userId);
+    }
+
+    private void testError() {
+        throw new RuntimeException("Test error");
+    }
 }
