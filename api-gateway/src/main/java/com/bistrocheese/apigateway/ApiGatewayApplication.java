@@ -32,24 +32,10 @@ public class ApiGatewayApplication {
                                 AppConstants.USER_SERVICE_KEY,
                                 AppConstants.ORDER_SERVICE_KEY,
                                 AppConstants.FOOD_SERVICE_KEY,
+                                AppConstants.AUTH_SERVICE_KEY
                                 AppConstants.PAYMENT_SERVICE_KEY
                         )
                         .collect(Collectors.toList())));
-        apiKeys.add(new ApiKey(
-                AppConstants.API_KEY_NORMAL,
-                Stream.of(
-                                AppConstants.USER_SERVICE_KEY,
-                                AppConstants.FOOD_SERVICE_KEY
-                        )
-                        .collect(Collectors.toList())));
-
-        apiKeys.add(new ApiKey(
-                AppConstants.API_KEY_FOOD,
-                Stream.of(
-                                AppConstants.FOOD_SERVICE_KEY
-                        )
-                        .collect(Collectors.toList())));
-
         List<Object> lists = redisHashComponent.hValues(AppConstants.RECORD_KEY);
         if (lists.size() != apiKeys.size()) {
             apiKeys.forEach(apiKey -> redisHashComponent.hSet(AppConstants.RECORD_KEY, apiKey.getApiKey(), apiKey));

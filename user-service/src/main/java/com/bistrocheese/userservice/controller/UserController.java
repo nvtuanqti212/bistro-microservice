@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(RouteConstant.USERS)
@@ -38,7 +37,6 @@ public class UserController {
 
     @GetMapping()
     public ResponseEntity<SuccessResponse<List<User>>> getAllUsers() throws InterruptedException {
-        Thread.sleep(3000);
         return ResponseEntity.ok(
                 new SuccessResponse<>(
                         MessageConstant.GET_USERS_SUCCESS,
