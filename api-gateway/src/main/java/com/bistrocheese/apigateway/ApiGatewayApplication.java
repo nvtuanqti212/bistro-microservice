@@ -31,21 +31,8 @@ public class ApiGatewayApplication {
                 Stream.of(
                                 AppConstants.USER_SERVICE_KEY,
                                 AppConstants.ORDER_SERVICE_KEY,
-                                AppConstants.FOOD_SERVICE_KEY
-                        )
-                        .collect(Collectors.toList())));
-        apiKeys.add(new ApiKey(
-                AppConstants.API_KEY_NORMAL,
-                Stream.of(
-                                AppConstants.USER_SERVICE_KEY,
-                                AppConstants.FOOD_SERVICE_KEY
-                        )
-                        .collect(Collectors.toList())));
-
-        apiKeys.add(new ApiKey(
-                AppConstants.API_KEY_FOOD,
-                Stream.of(
-                                AppConstants.FOOD_SERVICE_KEY
+                                AppConstants.FOOD_SERVICE_KEY,
+                                AppConstants.AUTH_SERVICE_KEY
                         )
                         .collect(Collectors.toList())));
 

@@ -1,0 +1,10 @@
+package com.bistrocheese.authservice.repository;
+
+import com.bistrocheese.authservice.entity.UserCredential;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserCredentialRepository extends JpaRepository<UserCredential, Long> {
+    UserCredential findByEmail(String email);
+}

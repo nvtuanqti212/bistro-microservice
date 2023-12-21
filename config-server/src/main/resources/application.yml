@@ -6,7 +6,7 @@ spring:
       server:
         git:
           uri: https://github.com/nvtuanqt212uit/bistro-config-repo.git
-          searchPaths: foodservice, orderservice, userservice, inventoryservice, eurekaservice, apigateway
+          searchPaths: foodservice, orderservice, userservice, inventoryservice, eurekaservice, apigateway, authservice
           username: nvtuanqt212uit
           password: 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
 

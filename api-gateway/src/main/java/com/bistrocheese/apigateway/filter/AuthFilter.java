@@ -1,61 +1,47 @@
 package com.bistrocheese.apigateway.filter;
 
-import com.bistrocheese.apigateway.config.RedisHashComponent;
-import com.bistrocheese.apigateway.dto.ApiKey;
-import com.bistrocheese.apigateway.util.AppConstants;
-import com.bistrocheese.apigateway.util.MapperUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.cloud.gateway.route.Route;
-import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
-import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
+import com.bistrocheese.apigateway.util.JwtUtils;
+import org.apache.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Component
-@Slf4j
-public class AuthFilter implements GlobalFilter, Ordered {
-    private final RedisHashComponent redisHashComponent;
+public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> {
+    @Autowired
+    private RouteValidator routeValidator;
 
-    public AuthFilter(RedisHashComponent redisHashComponent) {
-        this.redisHashComponent = redisHashComponent;
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    public AuthFilter() {
+        super(Config.class);
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        List<String> apiKeysHeader = exchange.getRequest().getHeaders().get("api-key");
-        log.info("apiKeysHeader: {}", apiKeysHeader);
-
-        Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
-        String routeId = route != null ? route.getId() : null;
-
-        if (routeId == null || CollectionUtils.isEmpty(apiKeysHeader) || !isAuthorized( apiKeysHeader.get(0), routeId)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "you can not access this service, please check your api key");
-        }
-        return chain.filter(exchange);
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            if (routeValidator.isSecured.test(exchange.getRequest())) {
+                if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                    throw new RuntimeException("Authorization header is missing");
+                }
+                String authorizationHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+                if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                    throw new RuntimeException("Authorization header is invalid");
+                }
+                String token = authorizationHeader.substring(7);
+                try {
+                    jwtUtils.validateToken(token);
+                } catch (Exception e) {
+                    throw new RuntimeException("Unauthorized access to the application");
+                }
+            }
+            return chain.filter(exchange);
+        };
     }
 
-    @Override
-    public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
-    }
+    public static class Config {
 
-    private boolean isAuthorized(String apiKey, String routeId) {
-        Object apiKeyObject = redisHashComponent.hGet(AppConstants.RECORD_KEY, apiKey);
-        log.info("apiKeyObject: {}", apiKeyObject);
-        if (apiKeyObject != null) {
-            ApiKey key = MapperUtils.objectMapper(apiKeyObject, ApiKey.class);
-            return key.getServices().contains(routeId);
-        } else {
-            log.info("apiKeyObject is null");
-            return false;
-        }
     }
 }
