@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
                 .staffId(staffId)
                 .status(OrderStatus.PENDING)
                 .totalPrice(BigDecimal.valueOf(0))
+                .createdAt(Timestamp.from(new Date().toInstant()))
                 .build();
         logger.info("orderLine: {}", orderLineList);
 
@@ -59,8 +62,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @RabbitListener(queues = {ROUTING_QUEUE})
     public void completeOrder(String message) {
-
-        testError();
 
         UUID orderId = UUID.fromString(message);
         Order order = orderRepository.findById(orderId).orElseThrow(
@@ -97,9 +98,5 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getOrdersByUserId(String userId) {
         return orderRepository.findAllByStaffId(userId);
-    }
-
-    private void testError() {
-        throw new RuntimeException("Test error");
     }
 }

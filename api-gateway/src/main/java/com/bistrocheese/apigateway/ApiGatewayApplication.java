@@ -32,7 +32,7 @@ public class ApiGatewayApplication {
                                 AppConstants.USER_SERVICE_KEY,
                                 AppConstants.ORDER_SERVICE_KEY,
                                 AppConstants.FOOD_SERVICE_KEY,
-                                AppConstants.AUTH_SERVICE_KEY
+                                AppConstants.AUTH_SERVICE_KEY,
                                 AppConstants.PAYMENT_SERVICE_KEY
                         )
                         .collect(Collectors.toList())));
