@@ -1,7 +1,9 @@
 package com.bistrocheese.paymentservice.service.impl;
 
+import com.bistrocheese.paymentservice.client.OrderFeignClient;
 import com.bistrocheese.paymentservice.constant.APIStatus;
 import com.bistrocheese.paymentservice.dto.request.BillRequest;
+import com.bistrocheese.paymentservice.dto.response.OrderResponse;
 import com.bistrocheese.paymentservice.exception.CustomException;
 import com.bistrocheese.paymentservice.model.Bill;
 import com.bistrocheese.paymentservice.model.Discount;
@@ -27,7 +29,7 @@ public class BillServiceImpl implements BillService {
     private final BillRepository billRepository;
 
     private final DiscountService discountService;
-    private final PaymentService paymentService;
+    private final OrderFeignClient orderFeignClient;
     private final BillPublisher billPublisher;
     private final static Logger logger = LogManager.getLogger(BillServiceImpl.class);
 
@@ -38,8 +40,14 @@ public class BillServiceImpl implements BillService {
             throw new CustomException(APIStatus.ORDER_PAID);
         }
 
+        OrderResponse order = orderFeignClient.getOrderById(billRequest.getOrderId()).getBody();
+
+        if (order == null) {
+            throw new CustomException(APIStatus.ORDER_NOT_FOUND);
+        }
+
         Bill bill = new Bill();
-        BigDecimal subTotalOrder = billRequest.getSubTotal();
+        BigDecimal subTotalOrder = order.getTotalPrice();
 
         // Create payment
 //        PaymentRequest paymentRequest = copyProperties(billRequest, PaymentRequest.class);
@@ -60,15 +68,13 @@ public class BillServiceImpl implements BillService {
         bill.setPaid(billRequest.getPaid());
         bill.setChange(billRequest.getPaid().subtract(total));
 
-//        bill.setCusIn(order.getCreatedAt());
+        bill.setCusIn(order.getCreatedAt());
         bill.setCusOut(new Date());
         try {
             billPublisher.completeOrder(billRequest.getOrderId());
         } catch (Exception e) {
             logger.error("Error payment service while sending message to queue: {}", e.getMessage());
         }
-        //TODO: Update order status
         billRepository.save(bill);
-
     }
 }

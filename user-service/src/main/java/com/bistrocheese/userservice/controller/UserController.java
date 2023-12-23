@@ -24,9 +24,6 @@ public class UserController {
     private final OwnerService ownerService;
     private final StaffService staffService;
 
-
-
-
     @PostMapping()
     public ResponseEntity<MessageResponse> createUser(@RequestBody UserRequest userRequest) {
         ownerService.createUser(userRequest);
@@ -61,7 +58,6 @@ public class UserController {
         );
     }
 
-    //Place Order
     @GetMapping(RouteConstant.USER_ID)
     @ResponseStatus(HttpStatus.OK)
     public Optional<? extends User> getUser(@PathVariable String userId) {

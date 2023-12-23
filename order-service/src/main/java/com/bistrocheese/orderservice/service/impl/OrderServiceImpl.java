@@ -1,29 +1,37 @@
 package com.bistrocheese.orderservice.service.impl;
 
 
+import com.bistrocheese.orderservice.client.FoodFeignClient;
+import com.bistrocheese.orderservice.client.UserFeignClient;
 import com.bistrocheese.orderservice.constant.APIStatus;
 import com.bistrocheese.orderservice.dto.request.OrderCreateRequest;
 import com.bistrocheese.orderservice.dto.request.OrderLineRequest;
+import com.bistrocheese.orderservice.dto.response.FoodResponse;
+import com.bistrocheese.orderservice.dto.response.order.UserResponse;
 import com.bistrocheese.orderservice.exception.CustomException;
 import com.bistrocheese.orderservice.model.*;
 import com.bistrocheese.orderservice.repository.OrderLineRepository;
 import com.bistrocheese.orderservice.repository.OrderRepository;
 import com.bistrocheese.orderservice.service.OrderLineService;
 import com.bistrocheese.orderservice.service.OrderService;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
-import static com.bistrocheese.orderservice.constant.RabbitConstant.ROUTING_QUEUE;
+import static com.bistrocheese.orderservice.constant.ServiceConstant.ORDER_SERVICE_BULKHEAD;
+import static com.bistrocheese.orderservice.constant.ServiceConstant.ORDER_SERVICE_CB;
 
 
 @Service
@@ -34,44 +42,48 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderLineRepository orderLineRepository;
     private final OrderLineService orderLineService;
+    private final FoodFeignClient foodFeignClient;
+    private final UserFeignClient userFeignClient;
+
     private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Override
-    @Transactional
-    public void createOrder(OrderCreateRequest req) {
+    @Bulkhead(name = ORDER_SERVICE_BULKHEAD, type = Bulkhead.Type.THREADPOOL, fallbackMethod = "fallback")
+    @CircuitBreaker(name = ORDER_SERVICE_CB, fallbackMethod = "fallback")
+    @Transactional(rollbackFor = CustomException.class)
+    public CompletableFuture<Order> createOrder(OrderCreateRequest req) {
         String staffId = req.getStaffId();
 
         List<OrderLineRequest> orderLineList = req.getOrderLines();
 
+        Optional<UserResponse> userResponse = userFeignClient.getUser(staffId);
+
+        //TODO: Custom Exception not working as expected
+        if (userResponse.isEmpty()) {
+            throw new RuntimeException(APIStatus.USER_NOT_FOUND.toString());
+        }
+
         Order newOrder = Order.builder()
-                .staffId(staffId)
+                .staffId(userResponse.get().getId())
                 .status(OrderStatus.PENDING)
                 .totalPrice(BigDecimal.valueOf(0))
                 .createdAt(Timestamp.from(new Date().toInstant()))
                 .build();
         logger.info("orderLine: {}", orderLineList);
 
-        UUID createdOrderId = orderRepository.save(newOrder).getId();
+        Order createdOrder = orderRepository.save(newOrder);
 
-        orderLineList.forEach(orderLine -> {
-            orderLineService.create(createdOrderId, orderLine);
+        //Todo: How to use reactive programming here? because asynchronous cause to change total_price of order concurrently -> blocking
+        orderLineList.forEach(orderLineRequest -> {
+            ResponseEntity<FoodResponse> foodResponse = foodFeignClient.getDetailFood(orderLineRequest.getFoodId());
+            if (foodResponse.getStatusCode().isError()) {
+                throw new CustomException(APIStatus.FOOD_NOT_FOUND);
+            }
+            orderLineRequest.setPrice(Objects.requireNonNull(foodResponse.getBody()).getPrice());
+            orderLineService.create(createdOrder.getId(), orderLineRequest);
         });
 
-    }
-
-    @Override
-    @RabbitListener(queues = {ROUTING_QUEUE})
-    public void completeOrder(String message) {
-
-        UUID orderId = UUID.fromString(message);
-        Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> new CustomException(APIStatus.ORDER_NOT_FOUND)
-        );
-
-        logger.info("At orderServiceIml, order completed: {}", order);
-
-        order.setStatus(OrderStatus.COMPLETED);
-        orderRepository.save(order);
+        return CompletableFuture.completedFuture(createdOrder);
     }
 
     @Override
@@ -99,4 +111,27 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getOrdersByUserId(String userId) {
         return orderRepository.findAllByStaffId(userId);
     }
+
+    private CompletableFuture<Order> fallback(OrderCreateRequest request, BulkheadFullException e) {
+        Order defaultOrder = Order.builder()
+                .staffId("BulkheadFullException")
+                .status(OrderStatus.PENDING)
+                .totalPrice(BigDecimal.valueOf(0))
+                .createdAt(Timestamp.from(new Date().toInstant()))
+                .build();
+        logger.error("BulkheadFullException: {}", e.toString());
+        return CompletableFuture.completedFuture(defaultOrder);
+    }
+
+    private CompletableFuture<Order> fallback(OrderCreateRequest request, CallNotPermittedException e) {
+        Order defaultOrder = Order.builder()
+                .staffId("CircleBreaker Open")
+                .status(OrderStatus.PENDING)
+                .totalPrice(BigDecimal.valueOf(0))
+                .createdAt(Timestamp.from(new Date().toInstant()))
+                .build();
+        logger.error("BulkheadFullException: {}", e.toString());
+        return CompletableFuture.completedFuture(defaultOrder);
+    }
+
 }

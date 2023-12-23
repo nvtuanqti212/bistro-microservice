@@ -1,6 +1,6 @@
-package com.bistrocheese.userservice.client;
+package com.bistrocheese.orderservice.client;
 
-import com.bistrocheese.userservice.dto.response.FoodResponse;
+import com.bistrocheese.orderservice.dto.response.FoodResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.UUID;
 
-import static com.bistrocheese.userservice.constant.ServiceConstant.FOOD_SERVICE;
+import static com.bistrocheese.orderservice.constant.ServiceConstant.FOOD_SERVICE;
 
 @FeignClient(FOOD_SERVICE)
 public interface FoodFeignClient {
