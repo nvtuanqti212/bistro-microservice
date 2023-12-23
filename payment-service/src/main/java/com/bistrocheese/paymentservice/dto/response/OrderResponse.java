@@ -1,4 +1,4 @@
-package com.bistrocheese.userservice.dto.response;
+package com.bistrocheese.paymentservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

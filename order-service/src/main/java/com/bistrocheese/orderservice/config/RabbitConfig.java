@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableRabbit
+//@EnableRabbit
 @RequiredArgsConstructor
 public class RabbitConfig {
 
@@ -26,13 +26,11 @@ public class RabbitConfig {
         return new Queue(ROUTING_KEY, true);
     }
 
-
     @Bean
     public Jackson2JsonMessageConverter jsonMessageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
         return new Jackson2JsonMessageConverter();
     }
-
 
     @Bean
     public RabbitTemplate rabbitTemplate(Jackson2JsonMessageConverter converter) {

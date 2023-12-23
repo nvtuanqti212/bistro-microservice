@@ -27,9 +27,9 @@ public class OrderController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> placeOrder(@RequestBody OrderCreateRequest request) {
-        orderService.createOrder(request);
-        return ResponseEntity.ok("Order Created");
+    public ResponseEntity<Order> placeOrder(@RequestBody OrderCreateRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(request).join());
     }
 
     @GetMapping()

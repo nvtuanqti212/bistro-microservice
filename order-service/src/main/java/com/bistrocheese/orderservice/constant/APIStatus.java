@@ -19,7 +19,14 @@ public enum APIStatus {
     ORDER_TABLE_NOT_EMPTY(400, "Order table not empty"),
 
     //    Payment
-    ORDER_COMPLETED(400, "Order already completed");
+    ORDER_COMPLETED(400, "Order already completed"),
+
+    // Food
+    FOOD_NOT_FOUND(404, "Food not found"),
+
+    // User
+    USER_NOT_FOUND(404, "User not found");
+
     private final int status;
     private final String message;
 }
