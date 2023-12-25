@@ -14,6 +14,8 @@ import com.bistrocheese.orderservice.repository.OrderLineRepository;
 import com.bistrocheese.orderservice.repository.OrderRepository;
 import com.bistrocheese.orderservice.service.OrderLineService;
 import com.bistrocheese.orderservice.service.OrderService;
+import com.bistrocheese.orderservice.service.RedisHashService;
+import com.bistrocheese.orderservice.utils.MapperUtils;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -30,6 +32,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+import static com.bistrocheese.orderservice.constant.RedisConstant.ORDERS;
 import static com.bistrocheese.orderservice.constant.ServiceConstant.ORDER_SERVICE_BULKHEAD;
 import static com.bistrocheese.orderservice.constant.ServiceConstant.ORDER_SERVICE_CB;
 
@@ -44,12 +47,13 @@ public class OrderServiceImpl implements OrderService {
     private final OrderLineService orderLineService;
     private final FoodFeignClient foodFeignClient;
     private final UserFeignClient userFeignClient;
+    private final RedisHashService redisHashService;
 
     private final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Override
-    @Bulkhead(name = ORDER_SERVICE_BULKHEAD, type = Bulkhead.Type.THREADPOOL, fallbackMethod = "fallback")
     @CircuitBreaker(name = ORDER_SERVICE_CB, fallbackMethod = "fallback")
+    @Bulkhead(name = ORDER_SERVICE_BULKHEAD, type = Bulkhead.Type.THREADPOOL, fallbackMethod = "fallback")
     @Transactional(rollbackFor = CustomException.class)
     public CompletableFuture<Order> createOrder(OrderCreateRequest req) {
         String staffId = req.getStaffId();
@@ -73,10 +77,13 @@ public class OrderServiceImpl implements OrderService {
 
         Order createdOrder = orderRepository.save(newOrder);
 
+        redisHashService.hSet(ORDERS, createdOrder.getId().toString(), createdOrder);
+
         //Todo: How to use reactive programming here? because asynchronous cause to change total_price of order concurrently -> blocking
         orderLineList.forEach(orderLineRequest -> {
             ResponseEntity<FoodResponse> foodResponse = foodFeignClient.getDetailFood(orderLineRequest.getFoodId());
             if (foodResponse.getStatusCode().isError()) {
+                orderRepository.delete(createdOrder);
                 throw new CustomException(APIStatus.FOOD_NOT_FOUND);
             }
             orderLineRequest.setPrice(Objects.requireNonNull(foodResponse.getBody()).getPrice());
@@ -102,6 +109,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getById(UUID orderId) {
+        Object order = redisHashService.hGet(ORDERS, orderId.toString());
+        if (order != null) {
+            return MapperUtils.objectMapper(order, Order.class);
+        }
         return orderRepository.findById(orderId).orElseThrow(
                 () -> new CustomException(APIStatus.ORDER_NOT_FOUND)
         );

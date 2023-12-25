@@ -43,5 +43,4 @@ public class OrderController {
     public ResponseEntity<Order> getOrderById(@PathVariable("id") UUID orderId) {
         return ResponseEntity.ok(orderService.getById(orderId));
     }
-    //TODO: Delete Order
 }
