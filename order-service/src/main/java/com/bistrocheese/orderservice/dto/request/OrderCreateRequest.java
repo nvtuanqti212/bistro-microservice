@@ -5,12 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class OrderCreateRequest {
+public class OrderCreateRequest implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+
     @JsonProperty("staffId")
     private String staffId;
     @JsonProperty("order_lines")
