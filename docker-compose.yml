@@ -1,0 +1,145 @@
+version: '0'
+services:
+  ## Mongo Docker Compose Config
+  user-service-mongo:
+    container_name: user-service-mongo
+    image: mongo:latest
+    restart: unless-stopped
+    hostname: user-service-mongo
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+    volumes:
+      - user-service-mongo-data:/data/db
+
+  auth-service-mysql:
+    image: mysql:8.2.0
+    container_name: auth-service-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      MYSQL_DATABASE: bistro-auth-service
+      MYSQL_USER: authservice
+      MYSQL_PASSWORD: 12345678
+    volumes:
+      - auth-service-mysql-data:/var/lib/mysql
+      - ./auth-service/src/main/resources/script:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD", "curl" ,"-f", "http://localhost:3306"]
+      interval: 1s
+      retries: 3
+      start_period: 25s
+    networks:
+      - bistro-microservices-network
+
+  config-server:
+    container_name: config-server
+    restart: unless-stopped
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    hostname: config-server
+    ports:
+        - "8888:8888"
+    networks:
+      - bistro-microservices-network
+
+  eureka-server:
+    container_name: eureka-server
+    restart: unless-stopped
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    hostname: eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+        - "8761:8761"
+    networks:
+      - bistro-microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://eureka-server:8761" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  auth-service:
+    container_name: auth-service
+    restart: unless-stopped
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    hostname: auth-service
+    ports:
+        - "9191:9191"
+    depends_on:
+      config-server:
+            condition: service_healthy
+      eureka-server:
+            condition: service_healthy
+      auth-service-mysql:
+            condition: service_healthy
+    environment:
+     - SPRING_PROFILES_ACTIVE=docker
+     - SPRING_APPLICATION_NAME=authservice
+     - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    networks:
+      - bistro-microservices-network
+
+  api-gateway:
+    container_name: api-gateway
+    restart: unless-stopped
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    hostname: api-gateway
+    ports:
+        - "8222:8222"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_APPLICATION_NAME=apigateway
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    links:
+        - auth-service:auth-service
+        - user-service:user-service
+    networks:
+      - bistro-microservices-network
+
+  user-service:
+    container_name: user-service
+    restart: unless-stopped
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    hostname: user-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      user-service-mongo:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_APPLICATION_NAME=userservice
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+    links:
+      - user-service-mongo:user-service-mongo
+    networks:
+      - bistro-microservices-network
+
+volumes:
+  auth-service-mysql-data:
+  user-service-mongo-data:
+networks:
+  bistro-microservices-network:
+    name: bistro-microservices-network
+
