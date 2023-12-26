@@ -18,6 +18,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -36,7 +37,11 @@ public class ApiFilter implements GlobalFilter, Ordered {
         Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
         String routeId = route != null ? route.getId() : null;
 
-        if (routeId == null || CollectionUtils.isEmpty(apiKeysHeader) || !isAuthorized( apiKeysHeader.get(0), routeId)) {
+        if (Objects.equals(routeId, "eurekaservice") || Objects.equals(routeId, "eurekaservice-static")) {
+            return chain.filter(exchange);
+        }
+
+        if (routeId == null || CollectionUtils.isEmpty(apiKeysHeader) || !isAuthorized(apiKeysHeader.get(0), routeId)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "you can not access this service, please check your api key");
         }
         return chain.filter(exchange);

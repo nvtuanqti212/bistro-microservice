@@ -9,7 +9,4 @@ public class AppConstants {
 
     public static final String RECORD_KEY = "api-keys";
     public static final String API_KEY = "DyipPeDzZzQbvdF91KRjGDSBS3Y6kg8e7By6Jx9RYayVkeBsi3OiX7DKuDkUjJ06";
-    public static final String API_KEY_NORMAL = "DyipPeDzZzQbvdF91KRjGDSBS3Y6kg8e7By6Jx9RYayVkeBsi3OiX7DKuDkUjJ08";
-
-    public static final String API_KEY_FOOD = "DyipPeDzZzQbvdF91KRjGDSBS3Y6kg8e7By6Jx9RYayVkeBsi3OiX7DKuDkUjJ10";
 }
