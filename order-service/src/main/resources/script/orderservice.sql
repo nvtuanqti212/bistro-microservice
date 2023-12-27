@@ -1,6 +1,3 @@
-create database orderservice;
-use orderservice;
-
 CREATE TABLE `orders` (
   `id` binary(16) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
