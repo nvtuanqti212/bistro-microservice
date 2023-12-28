@@ -197,6 +197,8 @@ services:
         condition: service_healthy
       api-gateway:
         condition: service_started
+      user-service:
+        condition: service_started
     environment:
      - SPRING_PROFILES_ACTIVE=docker
      - SPRING_APPLICATION_NAME=authservice
@@ -339,17 +341,6 @@ services:
       - "9090:9090"
     command:
       - --config.file=/etc/prometheus/prometheus.yml
-    networks:
-      - bistro-microservices-network
-
-  bistro-grafana:
-    image: grafana/grafana
-    container_name: bistro-grafana
-    hostname: bistro-grafana
-    ports:
-      - "3030:3000"
-    volumes:
-      - bistro-grafana-volume:/var/lib/grafana
     networks:
       - bistro-microservices-network
 
