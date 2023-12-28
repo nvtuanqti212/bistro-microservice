@@ -73,7 +73,6 @@ public class OrderServiceImpl implements OrderService {
                 .totalPrice(BigDecimal.valueOf(0))
                 .createdAt(Timestamp.from(new Date().toInstant()))
                 .build();
-        logger.info("orderLine: {}", orderLineList);
 
         Order createdOrder = orderRepository.save(newOrder);
 
@@ -86,11 +85,14 @@ public class OrderServiceImpl implements OrderService {
                 orderRepository.delete(createdOrder);
                 throw new CustomException(APIStatus.FOOD_NOT_FOUND);
             }
-            orderLineRequest.setPrice(Objects.requireNonNull(foodResponse.getBody()).getPrice());
+            orderLineRequest.setPrice(foodResponse.getBody().getPrice());
             orderLineService.create(createdOrder.getId(), orderLineRequest);
         });
 
-        return CompletableFuture.completedFuture(createdOrder);
+
+        return CompletableFuture.completedFuture(orderRepository.findById(createdOrder.getId()).orElseThrow(
+                () -> new CustomException(APIStatus.ORDER_CREATE_FAILED)
+        ));
     }
 
     @Override

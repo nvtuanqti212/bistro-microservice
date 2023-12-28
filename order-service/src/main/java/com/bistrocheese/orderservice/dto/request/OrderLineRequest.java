@@ -6,7 +6,6 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Getter
 @Data
 @Builder
 public class OrderLineRequest {
