@@ -344,6 +344,20 @@ services:
     networks:
       - bistro-microservices-network
 
+  bistro-grafana:
+    build:
+      context: ./bistro-grafana
+      dockerfile: Dockerfile
+    image: bistro-grafana
+    container_name: bistro-grafana
+    hostname: bistro-grafana
+    ports:
+      - "3030:3000"
+    volumes:
+      - bistro-grafana-volume:/var/lib/grafana
+    networks:
+      - bistro-microservices-network
+
 volumes:
   auth-service-mysql-data:
   user-service-mongo-data:
